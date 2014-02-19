@@ -56,7 +56,7 @@ function strftime(date, format) {
       case 'Y': return date.getFullYear();
       case 'y': var y = String(date.getFullYear()); return y.slice(y.length - 2);
       case 'Z': var tzString = date.toString().match(/\((\w+)\)/); return tzString && tzString[1] || '';
-      case 'z': var off = -date.getTimezoneOffset(); return (off < 0 ? '-' : '+') + pad(Math.abs(off / 60)) + pad(off % 60);
+      case 'z': var off = date.getTimezoneOffset(); return (off > 0 ? '-' : '+') + pad(Math.round(Math.abs(off / 60)), 2) + ':' + pad(off % 60, 2);
       default: return c;
     }
   });
