@@ -1,6 +1,8 @@
 var extend = require("extend");
 
 module.exports = {
+  names: require('date-names/en'),
+
   formats: {
     date: {
       default:  '%Y-%m-%d',
@@ -21,5 +23,3 @@ module.exports = {
     }
   }
 };
-
-extend(module.exports, require('date-names/en'));

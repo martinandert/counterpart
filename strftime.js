@@ -1,19 +1,21 @@
-"use strict";
+'use strict';
 
-var names = require("date-names");
+var dateNames = require('date-names');
 
-function strftime(date, format) {
+function strftime(date, format, names) {
   var timestamp = date.getTime();
+
+  names = names || dateNames;
 
   return format.replace(/%([-_0]?.)/g, function(_, c) {
     var padding = null;
 
     if (c.length == 2) {
       switch (c[0]) {
-        case '-': padding = '';  break; // omit padding
-        case '_': padding = ' '; break; // pad with space
-        case '0': padding = '0'; break; // pad with zero
-        default: return _; // unrecognized, return the format
+        case '-': padding = '';  break;
+        case '_': padding = ' '; break;
+        case '0': padding = '0'; break;
+        default: return _; // should never reach this one
       }
 
       c = c[1];

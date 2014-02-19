@@ -10,41 +10,35 @@ var events  = require('events');
 var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
 
-var translationScope = 'globalization';
+var translationNamespace = 'globalization';
 
 var registry = global.__g11n = global.__g11n || {
   locale: 'en',
-  scope: null,
+  namespace: null,
   translations: {},
   normalizedKeys: {}
 };
 
-function locale(value) {
-  if (value) {
-    var previousLocale = registry.locale;
-
-    if (previousLocale != value) {
-      registry.locale = value;
-      emitter.emit('localechange', value, previousLocale);
-    }
-
-    return previousLocale;
-  } else {
-    return registry.locale;
-  }
+function getLocale() {
+  return registry.locale;
 }
 
-function registerTranslations(scope, locale, data) {
-  if (arguments.length === 2) {
-    data    = locale;
-    locale  = scope;
-    scope   = translationScope;
+function setLocale(value) {
+  var previousLocale = registry.locale;
+
+  if (previousLocale != value) {
+    registry.locale = value;
+    emitter.emit('localechange', value, previousLocale);
   }
 
+  return previousLocale;
+}
+
+function registerTranslations(namespace, locale, data) {
   var translations = {};
 
-  translations[scope] = {};
-  translations[scope][locale] = data;
+  translations[namespace] = {};
+  translations[namespace][locale] = data;
 
   extend(true, registry.translations, translations);
 
@@ -62,17 +56,17 @@ function removeLocaleChangeListener(callback) {
 function translate(key, options) {
   options = options || {};
 
+  var namespace = options.namespace || registry.namespace;
+  delete options.namespace;
+
   var locale = options.locale || registry.locale;
   delete options.locale;
-
-  var scope = options.scope || registry.scope;
-  delete options.scope;
 
   if (!isArray(key) && typeof key !== 'string' || !key.length) {
     throw new Error('invalid argument: key');
   }
 
-  var keys = normalizeKeys(locale, scope, key);
+  var keys = normalizeKeys(namespace, locale, key);
 
   var entry = keys.reduce(function(result, key) {
     if (typeof result === 'object' && result !== null && key in result) {
@@ -99,20 +93,20 @@ function translate(key, options) {
 function localize(object, options) {
   options = options || {};
 
-  var locale = options.locale || registry.locale;
-  var scope  = options.scope  || translationScope;
-  var type   = options.type   || 'datetime';
-  var format = options.format || 'default';
+  var namespace = options.namespace || translationNamespace;
+  var locale    = options.locale    || registry.locale;
+  var type      = options.type      || 'datetime';
+  var format    = options.format    || 'default';
 
   if (!isDate(object)) {
     throw new Error('invalid argument: object must be a date');
   }
 
-  format = translate(['formats', type, format], { locale: locale, scope: scope });
+  format = translate(['formats', type, format], { namespace: namespace, locale: locale });
 
-  options = { locale: locale, scope: scope, format: format };
+  options = { namespace: namespace, locale: locale };
 
-  format = format.replace(/%[aAbBpP]/, function(match) {
+  /*format = format.replace(/%[aAbBpP]/, function(match) {
     switch (match) {
       case '%a': return translate('abbreviated_days',                   options)[object.getDay()];
       case '%A': return translate('days',                               options)[object.getDay()];
@@ -121,15 +115,15 @@ function localize(object, options) {
       case '%p': return translate(object.getHours() < 12 ? 'am' : 'pm', options).toUpperCase();
       case '%P': return translate(object.getHours() < 12 ? 'am' : 'pm', options).toLowerCase();
     }
-  });
+  });*/
 
-  return strftime(object, format);
+  return strftime(object, format, translate('names', options));
 }
 
-function normalizeKeys(locale, scope, key) {
+function normalizeKeys(namespace, locale, key) {
   var keys = [];
 
-  keys = keys.concat(normalizeKey(scope));
+  keys = keys.concat(normalizeKey(namespace));
   keys = keys.concat(normalizeKey(locale));
   keys = keys.concat(normalizeKey(key));
 
@@ -194,28 +188,29 @@ function withLocale(locale, callback, context) {
   return result;
 }
 
-function withScope(scope, callback, context) {
-  var previousScope = registry.scope;
-  registry.scope = scope;
+function withNamespace(namespace, callback, context) {
+  var previousNamespace = registry.namespace;
+  registry.namespace = namespace;
   var result = context ? callback.call(context) : callback();
-  registry.scope = previousScope;
+  registry.namespace = previousNamespace;
   return result;
 }
 
-registerTranslations('en', require('./locales/en'));
+registerTranslations(translationNamespace, 'en', require('./locales/en'));
 
-var g11n = {
-  locale: locale,
+var globalization = {
+  setLocale: setLocale,
+  getLocale: getLocale,
   translate: translate,
   localize: localize,
   withLocale: withLocale,
-  withScope: withScope,
+  withNamespace: withNamespace,
   registerTranslations: registerTranslations,
   onLocaleChange: addLocaleChangeListener,
   offLocaleChange: removeLocaleChangeListener,
   __registry: registry
 };
 
-module.exports = g11n;
+module.exports = globalization;
 module.exports.translate.registerTranslations = registerTranslations;
-module.exports.translate.withScope = withScope;
+module.exports.translate.withNamespace = withNamespace;
