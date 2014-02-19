@@ -2,14 +2,14 @@ BIN = ./node_modules/.bin
 REPO = $(shell cat .git/config | grep url | xargs echo | sed -E 's/^url = //g')
 REPONAME = $(shell echo $(REPO) | sed -E 's_.+:([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)\.git_\1/\2_')
 
-install link:
-	@npm $@
+test: lint
+	@$(BIN)/mocha -t 5000 -b -R spec spec.js
 
 lint:
 	@$(BIN)/jshint index.js strftime.js
 
-test: lint
-	@$(BIN)/mocha -t 5000 -b -R spec spec.js
+install link:
+	@npm $@
 
 release-patch: test
 	@$(call release,patch)

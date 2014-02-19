@@ -106,17 +106,6 @@ function localize(object, options) {
 
   options = { namespace: namespace, locale: locale };
 
-  /*format = format.replace(/%[aAbBpP]/, function(match) {
-    switch (match) {
-      case '%a': return translate('abbreviated_days',                   options)[object.getDay()];
-      case '%A': return translate('days',                               options)[object.getDay()];
-      case '%b': return translate('abbreviated_months',                 options)[object.getMonth()];
-      case '%B': return translate('months',                             options)[object.getMonth()];
-      case '%p': return translate(object.getHours() < 12 ? 'am' : 'pm', options).toUpperCase();
-      case '%P': return translate(object.getHours() < 12 ? 'am' : 'pm', options).toLowerCase();
-    }
-  });*/
-
   return strftime(object, format, translate('names', options));
 }
 
