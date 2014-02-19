@@ -5,26 +5,28 @@ var extend  = require("extend");
 var isArray = require("util").isArray;
 var isDate  = require("util").isDate;
 var sprintf = require("sprintf").sprintf;
-var emitter = require("events").EventEmitter;
+var events  = require("events");
 
 var strftime = require("./strftime");
+var emitter  = new events.EventEmitter();
 
 var registry = global.__g11n = global.__g11n || {
   locale: "en",
+  scope: null,
   translations: {},
   normalizedKeys: {}
 };
 
 function locale(value) {
   if (value) {
-    var oldLocale = registry.locale;
+    var previousLocale = registry.locale;
 
-    if (oldLocale != value) {
+    if (previousLocale != value) {
       registry.locale = value;
-      emitter.emit("localechange", value, oldLocale);
+      emitter.emit("localechange", value, previousLocale);
     }
 
-    return value;
+    return previousLocale;
   } else {
     return registry.locale;
   }
@@ -53,7 +55,7 @@ function translate(key, options) {
   var locale = options.locale || registry.locale;
   delete options.locale;
 
-  var scope = options.scope;
+  var scope = options.scope || registry.scope;
   delete options.scope;
 
   if (!isArray(key) && typeof key !== "string" || !key.length) {
@@ -173,10 +175,18 @@ function interpolate(entry, values) {
 }
 
 function withLocale(locale, callback, context) {
-  var currentLocale = registry.locale;
+  var previousLocale = registry.locale;
   registry.locale = locale;
   var result = context ? callback.call(context) : callback();
-  registry.locale = currentLocale;
+  registry.locale = previousLocale;
+  return result;
+}
+
+function withScope(scope, callback, context) {
+  var previousScope = registry.scope;
+  registry.scope = scope;
+  var result = context ? callback.call(context) : callback();
+  registry.scope = previousScope;
   return result;
 }
 
@@ -196,6 +206,7 @@ var g11n = {
   translate: translate,
   localize: localize,
   withLocale: withLocale,
+  withScope: withScope,
   registerTranslations: registerTranslations,
   onLocaleChange: addLocaleChangeListener,
   offLocaleChange: removeLocaleChangeListener,
@@ -203,3 +214,5 @@ var g11n = {
 };
 
 module.exports = g11n;
+module.exports.translate.registerTranslations = registerTranslations;
+module.exports.translate.withScope = withScope;
