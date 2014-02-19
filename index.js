@@ -102,8 +102,7 @@ function localize(object, options) {
     throw new Error('invalid argument: object must be a date');
   }
 
-  format = translate(['formats', type, format], { namespace: namespace, locale: locale });
-
+  format  = translate(['formats', type, format], { namespace: namespace, locale: locale });
   options = { namespace: namespace, locale: locale };
 
   return strftime(object, format, translate('names', options));
