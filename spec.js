@@ -25,8 +25,8 @@ describe('translate', function() {
         assert.doesNotThrow(function() { translate(['foo']); }, /invalid argument/);
       });
 
-      describe('with the default namespace set', function() {
-        describe('with the default locale set', function() {
+      describe('with the default namespace present', function() {
+        describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
             assert.equal(translate('foo'),          'missing translation: en.foo');
             assert.equal(translate('foo.bar'),      'missing translation: en.foo.bar');
@@ -36,7 +36,7 @@ describe('translate', function() {
           });
         });
 
-        describe('with a different locale set', function() {
+        describe('with a different locale present', function() {
           it('generates the correct normalized keys', function() {
             translate.withLocale('de', function() {
               assert.equal(translate('foo'),          'missing translation: de.foo');
@@ -49,8 +49,8 @@ describe('translate', function() {
         });
       });
 
-      describe('with a different namespace set', function() {
-        describe('with the default locale set', function() {
+      describe('with a different namespace present', function() {
+        describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
             translate.withNamespace('other', function() {
               assert.equal(translate('foo'),          'missing translation: other.en.foo');
@@ -62,7 +62,7 @@ describe('translate', function() {
           });
         });
 
-        describe('with a different locale set', function() {
+        describe('with a different locale present', function() {
           it('generates the correct normalized keys', function() {
             translate.withNamespace('other', function() {
               translate.withLocale('de', function() {
@@ -73,6 +73,217 @@ describe('translate', function() {
                 assert.equal(translate(['foo', 'bar']), 'missing translation: other.de.foo.bar');
               });
             });
+          });
+        });
+      });
+
+      describe('with the default namespace provided as option', function() {
+        describe('with the default locale present', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { namespace: null }),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar', { namespace: null }),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo'], { namespace: null }),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar'], { namespace: null }),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { namespace: null }), 'missing translation: en.foo.bar');
+          });
+        });
+
+        describe('with a different locale present', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withLocale('de', function() {
+              assert.equal(translate('foo', { namespace: null }),          'missing translation: de.foo');
+              assert.equal(translate('foo.bar', { namespace: null }),      'missing translation: de.foo.bar');
+              assert.equal(translate(['foo'], { namespace: null }),        'missing translation: de.foo');
+              assert.equal(translate(['foo.bar'], { namespace: null }),    'missing translation: de.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { namespace: null }), 'missing translation: de.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with a different namespace provided as option', function() {
+        describe('with the default locale present', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { namespace: 'other' }),          'missing translation: other.en.foo');
+            assert.equal(translate('foo.bar', { namespace: 'other' }),      'missing translation: other.en.foo.bar');
+            assert.equal(translate(['foo'], { namespace: 'other' }),        'missing translation: other.en.foo');
+            assert.equal(translate(['foo.bar'], { namespace: 'other' }),    'missing translation: other.en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { namespace: 'other' }), 'missing translation: other.en.foo.bar');
+          });
+        });
+
+        describe('with a different locale present', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withLocale('de', function() {
+              assert.equal(translate('foo', { namespace: 'other' }),          'missing translation: other.de.foo');
+              assert.equal(translate('foo.bar', { namespace: 'other' }),      'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo'], { namespace: 'other' }),        'missing translation: other.de.foo');
+              assert.equal(translate(['foo.bar'], { namespace: 'other' }),    'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { namespace: 'other' }), 'missing translation: other.de.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with the default locale provided as option', function() {
+        describe('with the default namespace present', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { locale: 'en' }),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar', { locale: 'en' }),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'en' }),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'en' }),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'en' }), 'missing translation: en.foo.bar');
+          });
+        });
+
+        describe('with a different namespace present', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              assert.equal(translate('foo', { locale: 'en' }),          'missing translation: other.en.foo');
+              assert.equal(translate('foo.bar', { locale: 'en' }),      'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'en' }),        'missing translation: other.en.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'en' }),    'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'en' }), 'missing translation: other.en.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with a different locale provided as option', function() {
+        describe('with the default namespace present', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { locale: 'de' }),          'missing translation: de.foo');
+            assert.equal(translate('foo.bar', { locale: 'de' }),      'missing translation: de.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'de' }),        'missing translation: de.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'de' }),    'missing translation: de.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'de' }), 'missing translation: de.foo.bar');
+          });
+        });
+
+        describe('with a different namespace present', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              assert.equal(translate('foo', { locale: 'de' }),          'missing translation: other.de.foo');
+              assert.equal(translate('foo.bar', { locale: 'de' }),      'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'de' }),        'missing translation: other.de.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'de' }),    'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'de' }), 'missing translation: other.de.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with the default locale provided as option', function() {
+        describe('with the default namespace provided as option', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { locale: 'en', namespace: null }),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar', { locale: 'en', namespace: null }),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'en', namespace: null }),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'en', namespace: null }),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'en', namespace: null }), 'missing translation: en.foo.bar');
+          });
+        });
+
+        describe('with a different namespace provided as option', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              assert.equal(translate('foo', { locale: 'en', namespace: 'other' }),          'missing translation: other.en.foo');
+              assert.equal(translate('foo.bar', { locale: 'en', namespace: 'other' }),      'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'en', namespace: 'other' }),        'missing translation: other.en.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'en', namespace: 'other' }),    'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'en', namespace: 'other' }), 'missing translation: other.en.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with a different locale provided as option', function() {
+        describe('with the default namespace provided as option', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo', { locale: 'de', namespace: null }),          'missing translation: de.foo');
+            assert.equal(translate('foo.bar', { locale: 'de', namespace: null }),      'missing translation: de.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'de', namespace: null }),        'missing translation: de.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'de', namespace: null }),    'missing translation: de.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'de', namespace: null }), 'missing translation: de.foo.bar');
+          });
+        });
+
+        describe('with a different namespace provided as option', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              assert.equal(translate('foo', { locale: 'de', namespace: 'other' }),          'missing translation: other.de.foo');
+              assert.equal(translate('foo.bar', { locale: 'de', namespace: 'other' }),      'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'de', namespace: 'other' }),        'missing translation: other.de.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'de', namespace: 'other' }),    'missing translation: other.de.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'de', namespace: 'other' }), 'missing translation: other.de.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with a translation for the key present', function() {
+        it('returns that translation', function() {
+          translate.__registry.translations = { foo: { bar: { baz: { bam: 'boo' } } } };
+
+          assert.equal(translate('baz.bam', { namespace: 'foo', locale: 'bar' }),           'boo');
+          assert.equal(translate('.baz..bam...', { namespace: 'foo', locale: 'bar' }),      'boo');
+          assert.equal(translate(['baz.bam'], { namespace: 'foo', locale: 'bar' }),         'boo');
+          assert.equal(translate(['baz', 'bam'], { namespace: 'foo', locale: 'bar' }),      'boo');
+          assert.equal(translate(['baz', '', 'bam'], { namespace: 'foo', locale: 'bar' }),  'boo');
+        });
+
+        describe('with a `count` provided as option', function() {
+          it('correctly pluralizes the translated value', function() {
+            translate.__registry.translations = { foo: { bar: { baz: { zero: 'no items', one: 'one item', other: '%(count)s items' } } } };
+
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 0 }),   'no items');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 1 }),   'one item');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 2 }),   '2 items');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 42 }),  '42 items');
+          });
+        });
+
+        describe('with other options provided', function() {
+          it('interpolates these options into the translated value', function() {
+            translate.__registry.translations = { foo: { bar: { baz: '1 %(a)s 2 %(b)s 3' } } };
+
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', b: 5, a: 4, c: 6 }), '1 4 2 5 3');
+          });
+        });
+      });
+
+      describe('with a translation for a prefix of the key present', function() {
+        it('returns the remaining translation part', function() {
+          translate.__registry.translations = { foo: { bar: { baz: { zero: 'no items', one: 'one item', other: '%(count)s items' } } } };
+
+          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), { zero: 'no items', one: 'one item', other: '%(count)s items' });
+        });
+      });
+
+      describe('with an array-type translation for the key present', function() {
+        it('returns the array that key points to', function() {
+          translate.__registry.translations = { foo: { bar: { baz: [1, 'A', 0.42] } } };
+
+          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), [1, 'A', 0.42]);
+        });
+      });
+
+      describe('without a translation for the key present', function() {
+        it('returns a string "missing translation: %(namespace).%(locale).%(key)"', function() {
+          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), 'missing translation: foo.bar.baz');
+        });
+
+        describe('with a `fallback` provided as option', function() {
+          it('returns the fallback', function() {
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: 'boom' }), 'boom');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: 'Hello, %(name)s!', name: 'Martin' }), 'Hello, Martin!');
+
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 0 }), 'no items');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 1 }), 'one item');
+            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
+
+            assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { oh: 'yeah' } }), { oh: 'yeah' });
+            assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar', fallback: [1, 'A', 0.42] }), [1, 'A', 0.42]);
           });
         });
       });

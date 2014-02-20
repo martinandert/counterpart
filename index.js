@@ -60,8 +60,6 @@ function translate(key, options) {
 
   options = options || {};
 
-  console.log(registry.namespace);
-
   var namespace = options.namespace || registry.namespace;
   delete options.namespace;
 
