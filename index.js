@@ -24,14 +24,14 @@ function getLocale() {
 }
 
 function setLocale(value) {
-  var previousLocale = registry.locale;
+  var previous = registry.locale;
 
-  if (previousLocale != value) {
+  if (previous != value) {
     registry.locale = value;
-    emitter.emit('localechange', value, previousLocale);
+    emitter.emit('localechange', value, previous);
   }
 
-  return previousLocale;
+  return previous;
 }
 
 function registerTranslations(namespace, locale, data) {
@@ -54,17 +54,19 @@ function removeLocaleChangeListener(callback) {
 }
 
 function translate(key, options) {
+  if (!isArray(key) && typeof key !== 'string' || !key.length) {
+    throw new Error('invalid argument: key');
+  }
+
   options = options || {};
+
+  console.log(registry.namespace);
 
   var namespace = options.namespace || registry.namespace;
   delete options.namespace;
 
   var locale = options.locale || registry.locale;
   delete options.locale;
-
-  if (!isArray(key) && typeof key !== 'string' || !key.length) {
-    throw new Error('invalid argument: key');
-  }
 
   var keys = normalizeKeys(namespace, locale, key);
 
@@ -91,16 +93,16 @@ function translate(key, options) {
 }
 
 function localize(object, options) {
+  if (!isDate(object)) {
+    throw new Error('invalid argument: object must be a date');
+  }
+
   options = options || {};
 
   var namespace = options.namespace || translationNamespace;
   var locale    = options.locale    || registry.locale;
   var type      = options.type      || 'datetime';
   var format    = options.format    || 'default';
-
-  if (!isDate(object)) {
-    throw new Error('invalid argument: object must be a date');
-  }
 
   format  = translate(['formats', type, format], { namespace: namespace, locale: locale });
   options = { namespace: namespace, locale: locale };
@@ -169,36 +171,34 @@ function interpolate(entry, values) {
 }
 
 function withLocale(locale, callback, context) {
-  var previousLocale = registry.locale;
+  var previous = registry.locale;
   registry.locale = locale;
   var result = context ? callback.call(context) : callback();
-  registry.locale = previousLocale;
+  registry.locale = previous;
   return result;
 }
 
 function withNamespace(namespace, callback, context) {
-  var previousNamespace = registry.namespace;
+  var previous = registry.namespace;
   registry.namespace = namespace;
   var result = context ? callback.call(context) : callback();
-  registry.namespace = previousNamespace;
+  registry.namespace = previous;
   return result;
 }
 
 registerTranslations(translationNamespace, 'en', require('./locales/en'));
 
-var globalization = {
-  setLocale: setLocale,
-  getLocale: getLocale,
-  translate: translate,
-  localize: localize,
-  withLocale: withLocale,
-  withNamespace: withNamespace,
-  registerTranslations: registerTranslations,
-  onLocaleChange: addLocaleChangeListener,
-  offLocaleChange: removeLocaleChangeListener,
-  __registry: registry
-};
+module.exports = translate;
 
-module.exports = globalization;
-module.exports.translate.registerTranslations = registerTranslations;
-module.exports.translate.withNamespace = withNamespace;
+module.exports.setLocale            = setLocale;
+module.exports.getLocale            = getLocale;
+module.exports.localize             = localize;
+module.exports.withLocale           = withLocale;
+module.exports.withNamespace        = withNamespace;
+module.exports.registerTranslations = registerTranslations;
+module.exports.onLocaleChange       = addLocaleChangeListener;
+module.exports.offLocaleChange      = removeLocaleChangeListener;
+
+if (process.env.NODE_ENV !== 'production') {
+  module.exports.__registry = registry;
+}

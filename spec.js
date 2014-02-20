@@ -1,7 +1,519 @@
-var assert  = require('assert');
+var assert    = require('assert');
+var translate = require('./');
 
-describe('The truth', function() {
-  it('is true', function() {
-    assert(true);
+describe('translate', function() {
+  it('is a function', function() {
+    var type = Object.prototype.toString.call(translate);
+    assert.equal(type, '[object Function]');
+  });
+
+  describe('when called', function() {
+    describe('with a non-empty string or array as first argument', function() {
+      var backup;
+
+      beforeEach(function() {
+        backup = translate.__registry.translations;
+        translate.__registry.translations = {};
+      });
+
+      afterEach(function() {
+        translate.__registry.translations = backup;
+      });
+
+      it('does not throw an invalid argument error', function() {
+        assert.doesNotThrow(function() { translate('foo'); },   /invalid argument/);
+        assert.doesNotThrow(function() { translate(['foo']); }, /invalid argument/);
+      });
+
+      describe('with the default namespace set', function() {
+        describe('with the default locale set', function() {
+          it('generates the correct normalized keys', function() {
+            assert.equal(translate('foo'),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar'),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo']),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar']),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar']), 'missing translation: en.foo.bar');
+          });
+        });
+
+        describe('with a different locale set', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withLocale('de', function() {
+              assert.equal(translate('foo'),          'missing translation: de.foo');
+              assert.equal(translate('foo.bar'),      'missing translation: de.foo.bar');
+              assert.equal(translate(['foo']),        'missing translation: de.foo');
+              assert.equal(translate(['foo.bar']),    'missing translation: de.foo.bar');
+              assert.equal(translate(['foo', 'bar']), 'missing translation: de.foo.bar');
+            });
+          });
+        });
+      });
+
+      describe('with a different namespace set', function() {
+        describe('with the default locale set', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              assert.equal(translate('foo'),          'missing translation: other.en.foo');
+              assert.equal(translate('foo.bar'),      'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo']),        'missing translation: other.en.foo');
+              assert.equal(translate(['foo.bar']),    'missing translation: other.en.foo.bar');
+              assert.equal(translate(['foo', 'bar']), 'missing translation: other.en.foo.bar');
+            });
+          });
+        });
+
+        describe('with a different locale set', function() {
+          it('generates the correct normalized keys', function() {
+            translate.withNamespace('other', function() {
+              translate.withLocale('de', function() {
+                assert.equal(translate('foo'),          'missing translation: other.de.foo');
+                assert.equal(translate('foo.bar'),      'missing translation: other.de.foo.bar');
+                assert.equal(translate(['foo']),        'missing translation: other.de.foo');
+                assert.equal(translate(['foo.bar']),    'missing translation: other.de.foo.bar');
+                assert.equal(translate(['foo', 'bar']), 'missing translation: other.de.foo.bar');
+              });
+            });
+          });
+        });
+      });
+    });
+
+    describe('without a valid key as first argument', function() {
+      it('throws an invalid argument error', function() {
+        assert.throws(function() { translate(); },            /invalid argument/);
+        assert.throws(function() { translate(null); },        /invalid argument/);
+        assert.throws(function() { translate(123); },         /invalid argument/);
+        assert.throws(function() { translate({}); },          /invalid argument/);
+        assert.throws(function() { translate(new Date()); },  /invalid argument/);
+        assert.throws(function() { translate(/./); },         /invalid argument/);
+        assert.throws(function() { translate([]); },          /invalid argument/);
+        assert.throws(function() { translate(''); },          /invalid argument/);
+      });
+    });
+  });
+
+  describe('in development mode', function() {
+    withNodeEnv('development', function() {
+      it('exposes a `__registry` object (for testing/debugging purposes)', function() {
+        assert.isObject(translate.__registry);
+      });
+    });
+  });
+
+  describe('in production mode', function() {
+    withNodeEnv('production', function() {
+      delete require.cache[__dirname + '/index.js'];
+      var prod = require('./');
+
+      it('does not expose a `__registry` accessor', function() {
+        assert.isUndefined(prod.__registry);
+      });
+    });
+  });
+
+  describe('#getLocale', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.getLocale);
+    });
+
+    it('returns the locale stored in the registry', function() {
+      assert.equal(translate.getLocale(), translate.__registry.locale);
+    });
+  });
+
+  describe('#setLocale', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.setLocale);
+    });
+
+    it('sets the locale stored in the registry', function() {
+      translate.setLocale('foo');
+      assert.equal(translate.__registry.locale, 'foo');
+    });
+
+    it('returns the previous locale that was stored in the registry', function() {
+      var current  = translate.getLocale();
+      var previous = translate.setLocale(current + 'x');
+      assert.equal(previous, current);
+    });
+
+    describe('when called with a locale that differs from the current one', function() {
+      it('emits a "localechange" event', function(done) {
+        var handler = function() { done() };
+        translate.onLocaleChange(handler);
+        translate.setLocale(translate.getLocale() + 'x');
+        translate.offLocaleChange(handler);
+      });
+    });
+
+    describe('when called with the current locale', function() {
+      it('does not emit a "localechange" event', function(done) {
+        var handler = function() { done('event was emitted'); };
+        translate.onLocaleChange(handler);
+        translate.setLocale(translate.getLocale());
+        translate.offLocaleChange(handler);
+        setTimeout(done, 100);
+      });
+    });
+  });
+
+  describe('#withLocale', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.withLocale);
+    });
+
+    it('temporarily changes the current locale within the callback', function() {
+      var locale = translate.getLocale();
+
+      translate.withLocale(locale + 'x', function() {
+        assert.equal(translate.getLocale(), locale + 'x');
+      });
+
+      assert.equal(translate.getLocale(), locale);
+    });
+
+    it('allows a custom callback context to be set', function() {
+      translate.withLocale('foo', function() {
+        assert.equal(this.bar, 'baz');
+      }, { bar: 'baz' })
+    });
+
+    it('does not emit a "localechange" event', function(done) {
+      var handler = function() { done('event was emitted'); };
+      translate.onLocaleChange(handler);
+      translate.withLocale(translate.getLocale() + 'x', function() {});
+      translate.offLocaleChange(handler);
+      setTimeout(done, 100);
+    });
+
+    it('returns the return value of the callback', function() {
+      var result = translate.withLocale('foo', function() { return 'bar'; });
+      assert.equal(result, 'bar');
+    });
+  });
+
+  describe('#withNamespace', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.withNamespace);
+    });
+
+    it('temporarily changes the current namespace within the callback', function() {
+      var namespace = translate.__registry.namespace;
+
+      translate.withNamespace(namespace + 'x', function() {
+        assert.equal(translate.__registry.namespace, namespace + 'x');
+      });
+
+      assert.equal(translate.__registry.namespace, namespace);
+    });
+
+    it('allows a custom callback context to be set', function() {
+      translate.withNamespace('foo', function() {
+        assert.equal(this.bar, 'baz');
+      }, { bar: 'baz' })
+    });
+
+    it('returns the return value of the callback', function() {
+      var result = translate.withNamespace('foo', function() { return 'bar'; });
+      assert.equal(result, 'bar');
+    });
+  });
+
+  describe('#onLocaleChange', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.onLocaleChange);
+    });
+
+    it('is called when the locale changes', function(done) {
+      var handler = function() { done(); };
+      translate.onLocaleChange(handler);
+      translate.setLocale(translate.getLocale() + 'x');
+      translate.offLocaleChange(handler);
+    });
+
+    it('is not called when the locale does not change', function(done) {
+      var handler = function() { done('function was called'); };
+      translate.onLocaleChange(handler);
+      translate.setLocale(translate.getLocale());
+      translate.offLocaleChange(handler);
+      setTimeout(done, 100);
+    });
+
+    describe('when called', function() {
+      it('exposes both the new and old locale as arguments', function(done) {
+        var oldLocale = translate.getLocale();
+        var newLocale = oldLocale + 'x';
+
+        var handler = function(locale, previousLocale) {
+          assert.equal(locale, newLocale);
+          assert.equal(previousLocale, oldLocale);
+          done();
+        };
+
+        translate.onLocaleChange(handler);
+        translate.setLocale(newLocale);
+        translate.offLocaleChange(handler);
+      });
+    });
+  });
+
+  describe('#offLocaleChange', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.offLocaleChange);
+    });
+
+    it('stops the emission of events to the handler', function(done) {
+      var count = 0;
+
+      var handler = function() { count++; };
+
+      translate.onLocaleChange(handler);
+      translate.setLocale(translate.getLocale() + 'x');
+      translate.setLocale(translate.getLocale() + 'x');
+      translate.offLocaleChange(handler);
+      translate.setLocale(translate.getLocale() + 'x');
+
+      setTimeout(function() {
+        assert.equal(count, 2, 'handler was called although deactivated');
+        done();
+      }, 100);
+    });
+  });
+
+  describe('#localize', function() {
+    before(function() {
+      translate.setLocale('en');
+    });
+
+    it('is a function', function() {
+      assert.isFunction(translate.localize);
+    });
+
+    describe('when called without a date as first argument', function() {
+      it('throws an invalid argument error', function() {
+        assert.throws(function() {
+          translate.localize('foo');
+        }, /invalid argument/);
+      });
+    });
+
+    describe('when called with a date as first argument', function() {
+      var date = new Date('Thu Feb 20 2014 12:37:46 GMT+0100 (CET)');
+
+      describe('without providing options as second argument', function() {
+        it('returns the default localization for that date', function() {
+          var result = translate.localize(date);
+          assert.equal(result, 'Thu, 20 Feb 2014 12:37:46 +01:00');
+        });
+      });
+
+      describe('providing a `format` key in the options', function() {
+        describe('with format = "default"', function() {
+          it('returns the default localization for that date', function() {
+            var result = translate.localize(date, { format: 'default' });
+            assert.equal(result, 'Thu, 20 Feb 2014 12:37:46 +01:00');
+          });
+        });
+
+        describe('with format = "short"', function() {
+          it('returns the short localization for that date', function() {
+            var result = translate.localize(date, { format: 'short' });
+            assert.equal(result, '20 Feb 12:37');
+          });
+        });
+
+        describe('with format = "long"', function() {
+          it('returns the long localization for that date', function() {
+            var result = translate.localize(date, { format: 'long' });
+            assert.equal(result, 'February 20, 2014 12:37');
+          });
+        });
+
+        describe('with an unknown format', function() {
+          it('returns a string containing "missing translation"', function() {
+            var result = translate.localize(date, { format: '__invalid__' });
+            assert.matches(result, /missing translation/);
+          });
+        });
+      });
+
+      describe('providing a `type` key in the options', function() {
+        describe('with type = "datetime"', function() {
+          it('returns the default localization for that date', function() {
+            var result = translate.localize(date, { type: 'datetime' });
+            assert.equal(result, 'Thu, 20 Feb 2014 12:37:46 +01:00');
+          });
+        });
+
+        describe('with type = "date"', function() {
+          it('returns the date localization for that date', function() {
+            var result = translate.localize(date, { type: 'date' });
+            assert.equal(result, '2014-02-20');
+          });
+        });
+
+        describe('with type = "time"', function() {
+          it('returns the time localization for that date', function() {
+            var result = translate.localize(date, { type: 'time' });
+            assert.equal(result, '12:37:46 +01:00');
+          });
+        });
+
+        describe('with an unknown type', function() {
+          it('returns a string containing "missing translation"', function() {
+            var result = translate.localize(date, { type: '__invalid__' });
+            assert.matches(result, /missing translation/);
+          });
+        });
+      });
+
+      describe('providing both a `type` key and a `format` key in the options', function() {
+        describe('with type = "datetime" and format = "default"', function() {
+          it('returns the default localization for that date', function() {
+            var result = translate.localize(date, { type: 'datetime', format: 'default' });
+            assert.equal(result, 'Thu, 20 Feb 2014 12:37:46 +01:00');
+          });
+        });
+
+        describe('with type = "datetime" and format = "short"', function() {
+          it('returns the short datetime localization for that date', function() {
+            var result = translate.localize(date, { type: 'datetime', format: 'short' });
+            assert.equal(result, '20 Feb 12:37');
+          });
+        });
+
+        describe('with type = "datetime" and format = "long"', function() {
+          it('returns the long datetime localization for that date', function() {
+            var result = translate.localize(date, { type: 'datetime', format: 'long' });
+            assert.equal(result, 'February 20, 2014 12:37');
+          });
+        });
+
+        describe('with type = "time" and format = "default"', function() {
+          it('returns the default time localization for that date', function() {
+            var result = translate.localize(date, { type: 'time', format: 'default' });
+            assert.equal(result, '12:37:46 +01:00');
+          });
+        });
+
+        describe('with type = "time" and format = "short"', function() {
+          it('returns the short time localization for that date', function() {
+            var result = translate.localize(date, { type: 'time', format: 'short' });
+            assert.equal(result, '12:37');
+          });
+        });
+
+        describe('with type = "time" and format = "long"', function() {
+          it('returns the long time localization for that date', function() {
+            var result = translate.localize(date, { type: 'time', format: 'long' });
+            assert.equal(result, '12:37');
+          });
+        });
+
+        describe('with type = "date" and format = "default"', function() {
+          it('returns the default date localization for that date', function() {
+            var result = translate.localize(date, { type: 'date', format: 'default' });
+            assert.equal(result, '2014-02-20');
+          });
+        });
+
+        describe('with type = "date" and format = "short"', function() {
+          it('returns the short date localization for that date', function() {
+            var result = translate.localize(date, { type: 'date', format: 'short' });
+            assert.equal(result, 'Feb 20');
+          });
+        });
+
+        describe('with type = "date" and format = "long"', function() {
+          it('returns the long date localization for that date', function() {
+            var result = translate.localize(date, { type: 'date', format: 'long' });
+            assert.equal(result, 'February 20, 2014');
+          });
+        });
+
+        describe('with unknown type and unknown format', function() {
+          it('returns a string containing "missing translation"', function() {
+            var result = translate.localize(date, { type: '__invalid__', format: '__invalid__' });
+            assert.matches(result, /missing translation/);
+          });
+        });
+      });
+    });
+  });
+
+  describe('#registerTranslations', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.registerTranslations);
+    });
+
+    it('returns the passed arguments as an object structure', function() {
+      var namespace = 'foo';
+      var locale    = 'bar';
+      var data      = { baz: 'bingo' };
+
+      var actual = translate.registerTranslations(namespace, locale, data);
+
+      var expected = { foo: { bar: { baz: 'bingo' }}};
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('merges the passed arguments correctly into the registry', function() {
+      translate.__registry.translations = {};
+
+      translate.registerTranslations('foo', 'bar', { baz: 'bingo' });
+      var expected = { foo: { bar: { baz: 'bingo' } } };
+      assert.deepEqual(translate.__registry.translations, expected);
+
+      translate.registerTranslations('foo', 'bar', { bam: 'boo' });
+      var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' } } };
+      assert.deepEqual(translate.__registry.translations, expected);
+
+      translate.registerTranslations('foo', 'bing', { bong: 'beng' });
+      var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' }, bing: { bong: 'beng' } } };
+      assert.deepEqual(translate.__registry.translations, expected);
+    });
   });
 });
+
+
+
+
+
+/* Helper Functions */
+
+assert.isString = function(value, message) {
+  assert.equal(Object.prototype.toString.call(value), '[object String]', message || (value + ' is not a string'));
+};
+
+assert.isFunction = function(value, message) {
+  assert.equal(Object.prototype.toString.call(value), '[object Function]', message || (value + ' is not a function'));
+};
+
+assert.isObject = function(value, message) {
+  assert.equal(Object.prototype.toString.call(value), '[object Object]', message || (value + ' is not an object'));
+};
+
+assert.isUndefined = function(value, message) {
+  assert.equal(Object.prototype.toString.call(value), '[object Undefined]', message || (value + ' is not undefined'));
+};
+
+assert.matches = function(actual, expected, message) {
+  if (!expected.test(actual)) {
+    assert.fail(actual, expected, message, '!~');
+  }
+};
+
+function exposesFunction(object, name) {
+  it('exposes a `' + name + '` function', function() {
+    assert.isFunction(object[name]);
+  });
+}
+
+function withNodeEnv(env, callback) {
+  var previous = process.env.NODE_ENV;
+  process.env.NODE_ENV = env;
+  var result = callback();
+  process.env.NODE_ENV = previous;
+  return result;
+}
