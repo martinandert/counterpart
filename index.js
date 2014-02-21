@@ -65,7 +65,7 @@ function translate(key, options) {
   var keys = normalizeKeys(locale, scope, key);
 
   var entry = keys.reduce(function(result, key) {
-    if (typeof result === 'object' && result !== null && key in result) {
+    if (Object.prototype.toString.call(result) === '[object Object]' && Object.prototype.hasOwnProperty.call(result, key)) {
       return result[key];
     } else {
       return null;
