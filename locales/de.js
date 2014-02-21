@@ -1,3 +1,6 @@
+// The translations in this file can be added with:
+//   #registerTranslations('de', require('globalization/locales/de');
+
 module.exports = {
   globalization: {
     names: require('date-names/de'),
@@ -5,21 +8,21 @@ module.exports = {
 
     formats: {
       date: {
-        default:  '%Y-%m-%d',
-        long:     '%B %d, %Y',
-        short:    '%b %d'
+        default:  '%a, %e. %b %Y',
+        long:     '%A, %e. %B %Y',
+        short:    '%d.%m.%y'
       },
 
       time: {
-        default:  '%H:%M:%S %z',
-        long:     '%H:%M',
+        default:  '%H:%M Uhr',
+        long:     '%H:%M:%S %z',
         short:    '%H:%M'
       },
 
       datetime: {
-        default:  '%a, %d %b %Y %H:%M:%S %z',
-        long:     '%B %d, %Y %H:%M',
-        short:    '%d %b %H:%M'
+        default:  '%a, %e. %b %Y, %H:%M Uhr',
+        long:     '%A, %e. %B %Y, %H:%M:%S %z',
+        short:    '%d.%m.%y %H:%M'
       }
     }
   }

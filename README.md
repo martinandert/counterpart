@@ -99,7 +99,7 @@ translate('x_items', { count: 1  })  // => 'One item.'
 translate('x_items', { count: 42 })  // => '42 items.'
 ```
 
-Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding translation data](#adding-translation-data) to the "globalization" namespace. Pull requests are welcome.
+Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding custom translation data](#adding-translation-data) to the "globalization" namespace. Pull requests are welcome.
 
 As seen above, the `count` option can be used both for pluralization and interpolation.
 
@@ -193,7 +193,28 @@ require('globalization').registerTranslations('de', require('my_package/locales/
 
 ### Localization
 
-*Soon to be documented...*
+The globalization package comes with support for localizing JavaScript Date objects. The `localize` function expects a date and options as arguments. The following example demonstrates the possible options.
+
+```js
+var date = new Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
+
+translate.localize(date)                       // => 'Fri, 21 Feb 2014 13:46'
+translate.localize(date, { format: 'short' })  // => '21 Feb 13:46'
+translate.localize(date, { format: 'long' })   // => 'Friday, February 21st, 2014 13:46:24 +01:00'
+
+translate.localize(date, { type: 'date' })                  // => 'Fri, 21 Feb 2014'
+translate.localize(date, { type: 'date', format: 'short' }) // => 'Feb 21'
+translate.localize(date, { type: 'date', format: 'long' })  // => 'Friday, February 21st, 2014'
+
+translate.localize(date, { type: 'time' })                  // => '13:46'
+translate.localize(date, { type: 'time', format: 'short' }) // => '13:46'
+translate.localize(date, { type: 'time', format: 'long' })  // => '13:46:24 +01:00'
+
+translate.registerTranslations('de', require('globalization/locales/de'));
+translate.localize(date, { locale: 'de' }))  // => 'Fr, 21.02.2014, 13:46'
+```
+
+Sure, you can add your custom localizations by adding to or overwriting the "globalization" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
 
 
 ## Contributing

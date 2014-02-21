@@ -145,7 +145,7 @@ function pluralize(locale, entry, count) {
     return entry;
   }
 
-  var pluralizeFunc = translate('globalization.pluralize', { locale: locale });
+  var pluralizeFunc = translate('pluralize', { locale: locale, scope: translationScope });
 
   if (Object.prototype.toString.call(pluralizeFunc) !== '[object Function]') {
     return pluralizeFunc;

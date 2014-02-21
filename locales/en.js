@@ -1,3 +1,5 @@
+// The translations in this file are added by default.
+
 module.exports = {
   globalization: {
     names: require('date-names/en'),
@@ -5,21 +7,21 @@ module.exports = {
 
     formats: {
       date: {
-        default:  '%Y-%m-%d',
-        long:     '%B %d, %Y',
-        short:    '%b %d'
+        default:  '%a, %e %b %Y',
+        long:     '%A, %B %o, %Y',
+        short:    '%b %e'
       },
 
       time: {
-        default:  '%H:%M:%S %z',
-        long:     '%H:%M',
+        default:  '%H:%M',
+        long:     '%H:%M:%S %z',
         short:    '%H:%M'
       },
 
       datetime: {
-        default:  '%a, %d %b %Y %H:%M:%S %z',
-        long:     '%B %d, %Y %H:%M',
-        short:    '%d %b %H:%M'
+        default:  '%a, %e %b %Y %H:%M',
+        long:     '%A, %B %o, %Y %H:%M:%S %z',
+        short:    '%e %b %H:%M'
       }
     }
   }
