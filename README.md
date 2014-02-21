@@ -101,7 +101,7 @@ translate('x_items', { count: 42 })  // => "42 items."
 
 Note that this library currently only supports an algorithm for English-like pluralization rules. Support for other algorithms is planned.
 
-As seen above, the `:count` option can be used both for pluralization and interpolation.
+As seen above, the `count` option can be used both for pluralization and interpolation.
 
 ### Fallbacks
 
