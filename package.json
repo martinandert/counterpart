@@ -1,7 +1,7 @@
 {
   "name": "globalization",
   "version": "0.7.0",
-  "description": "globalization = internationalization + localization",
+  "description": "A translation and localization library for Node.js and the browser",
   "main": "index.js",
   "repository": {
     "type": "git",
