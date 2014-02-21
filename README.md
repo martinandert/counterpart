@@ -214,7 +214,7 @@ translate.registerTranslations('de', require('globalization/locales/de'));
 translate.localize(date, { locale: 'de' })  // => 'Fr, 21. Feb 2014, 13:46 Uhr'
 ```
 
-Sure, you can add your custom localizations by adding to or overwriting the "globalization" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
+Sure, you can integrate custom localizations by adding to or overwriting the "globalization" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
 
 
 ## Contributing
