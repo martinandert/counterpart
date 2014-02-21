@@ -771,6 +771,22 @@ describe('translate', function() {
 
       assert.equal(translate.withLocale('de', function() { return translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
       assert.equal(translate.withLocale('de', function() { return translate('x_items', { scope: 'my_project', count: 1 }); }), '1 Stück');
+
+      var date = new Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
+
+      assert.equal(translate.localize(date)                       , 'Fri, 21 Feb 2014 13:46');
+      assert.equal(translate.localize(date, { format: 'short' })  , '21 Feb 13:46');
+      assert.equal(translate.localize(date, { format: 'long' })   , 'Friday, February 21st, 2014 13:46:24 +01:00');
+
+      assert.equal(translate.localize(date, { type: 'date' })                  , 'Fri, 21 Feb 2014');
+      assert.equal(translate.localize(date, { type: 'date', format: 'short' }) , 'Feb 21');
+      assert.equal(translate.localize(date, { type: 'date', format: 'long' })  , 'Friday, February 21st, 2014');
+
+      assert.equal(translate.localize(date, { type: 'time' })                  , '13:46');
+      assert.equal(translate.localize(date, { type: 'time', format: 'short' }) , '13:46');
+      assert.equal(translate.localize(date, { type: 'time', format: 'long' })  , '13:46:24 +01:00');
+
+      assert.equal(translate.localize(date, { locale: 'de' })  , 'Fr, 21. Feb 2014, 13:46 Uhr');
     });
   });
 });
