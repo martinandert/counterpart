@@ -155,7 +155,7 @@ There is also a `withScope` function that works exactly the same as `withLocale`
 
 ### Adding Translation Data
 
-You can use the `registerTranslation` function to deep-merge data for a specific locale into the global translation object:
+You can use the `registerTranslations` function to deep-merge data for a specific locale into the global translation object:
 
 ```js
 translate.registerTranslations('de', require('globalization/locales/de'));
