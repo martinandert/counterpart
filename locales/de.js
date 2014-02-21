@@ -1,7 +1,7 @@
 module.exports = {
   globalization: {
-    names: require('date-names/en'),
-    pluralize: require('pluralizers/en'),
+    names: require('date-names/de'),
+    pluralize: require('pluralizers/de'),
 
     formats: {
       date: {

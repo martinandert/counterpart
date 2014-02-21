@@ -151,6 +151,15 @@ describe('translate', function() {
         });
       });
 
+      describe('with a function-type translation for the key present', function() {
+        it('returns the array that key points to', function() {
+          var myFunc = function() {};
+
+          translate.registerTranslations('en', { foo: { bar: { baz: myFunc } } });
+          assert.equal(translate(['bar', 'baz'], { scope: 'foo' }), myFunc);
+        });
+      });
+
       describe('without a translation for the key present', function() {
         it('returns a string "missing translation: %(locale).%(scope).%(key)"', function() {
           assert.deepEqual(translate('bar', { locale: 'unknown', scope: 'foo' }), 'missing translation: unknown.foo.bar');
@@ -161,9 +170,9 @@ describe('translate', function() {
             assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: 'boom' }), 'boom');
             assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: 'Hello, %(name)s!', name: 'Martin' }), 'Hello, Martin!');
 
-            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 0 }), 'no items');
-            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 1 }), 'one item');
-            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
+            assert.equal(translate('bazz', { locale: 'en', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 0 }), 'no items');
+            assert.equal(translate('bazz', { locale: 'en', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 1 }), 'one item');
+            assert.equal(translate('bazz', { locale: 'en', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
 
             assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: { oh: 'yeah' } }), { oh: 'yeah' });
             assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: [1, 'A', 0.42] }), [1, 'A', 0.42]);
@@ -566,6 +575,10 @@ describe('translate', function() {
       translate.registerTranslations('foo', { bing: { bong: 'beng' } });
       var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' }, bing: { bong: 'beng' } } };
       assert.deepEqual(translate.__registry.translations, expected);
+
+      // clean up
+      translate.__registry.translations = {};
+      translate.registerTranslations('en', require('./locales/en'));
     });
   });
 
@@ -607,9 +620,11 @@ describe('translate', function() {
 
       assert.equal(translate('baz', { fallback: 'default' }), 'default');
 
+      translate.registerTranslations('de', require('./locales/de'));
       translate.registerTranslations('de', JSON.parse('{"my_project": {"greeting": "Hallo, %(name)s!","x_items": {"one": "1 Stück", "other": "%(count)s Stücke"}}}'));
 
       assert.equal(translate.withLocale('de', function() { return translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
+      assert.equal(translate.withLocale('de', function() { return translate('x_items', { scope: 'my_project', count: 1 }); }), '1 Stück');
     });
   });
 });

@@ -6,7 +6,7 @@ Features:
 
 -  translation and localization
 -  interpolation of values to translations (sprintf-style with named arguments)
--  pluralization
+-  pluralization (CLDR compatible)
 
 
 ## Installation
@@ -99,7 +99,7 @@ translate('x_items', { count: 1  })  // => 'One item.'
 translate('x_items', { count: 42 })  // => '42 items.'
 ```
 
-Note that this library currently only supports an algorithm for English-like pluralization rules. Support for other algorithms is planned.
+Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding translation data](#adding-translation-data) to the "globalization" namespace. Pull requests are welcome.
 
 As seen above, the `count` option can be used both for pluralization and interpolation.
 
@@ -158,6 +158,7 @@ There is also a `withScope` function that works exactly the same as `withLocale`
 You can use the `registerTranslation` function to deep-merge data for a specific locale into the global translation object:
 
 ```js
+translate.registerTranslations('de', require('globalization/locales/de'));
 translate.registerTranslations('de', require('./locales/de.json'));
 ```
 
@@ -212,4 +213,4 @@ Here's a quick guide:
 
 ## License
 
-The MIT License.
+Released under The MIT License.

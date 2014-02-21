@@ -80,7 +80,7 @@ function translate(key, options) {
     }
   }
 
-  entry = pluralize(entry, options.count);
+  entry = pluralize(locale, entry, options.count);
   entry = interpolate(entry, options);
 
   return entry;
@@ -140,20 +140,18 @@ function normalizeKey(key) {
   return registry.normalizedKeys[key];
 }
 
-function pluralize(entry, count) {
+function pluralize(locale, entry, count) {
   if (typeof entry !== 'object' || entry === null || typeof count !== 'number') {
     return entry;
   }
 
-  var key;
+  var pluralizeFunc = translate('globalization.pluralize', { locale: locale });
 
-  if (count === 0 && 'zero' in entry) {
-    key = 'zero';
+  if (Object.prototype.toString.call(pluralizeFunc) !== '[object Function]') {
+    return pluralizeFunc;
   }
 
-  key = key || (count === 1 ? 'one' : 'other');
-
-  return entry[key];
+  return pluralizeFunc(entry, count);
 }
 
 function interpolate(entry, values) {

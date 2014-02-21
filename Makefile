@@ -6,7 +6,7 @@ test: lint
 	@$(BIN)/mocha -t 5000 -b -R spec spec.js
 
 lint:
-	@$(BIN)/jshint index.js strftime.js
+	@$(BIN)/jshint index.js strftime.js locales/en.js locales/de.js
 
 install link:
 	@npm $@

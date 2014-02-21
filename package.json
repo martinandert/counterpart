@@ -33,7 +33,8 @@
     "extend": "~1.2.1",
     "global": "~2.0.7",
     "sprintf": "~0.1.3",
-    "date-names": "~0.1.1"
+    "date-names": "~0.1.1",
+    "pluralizers": "~0.1.0"
   },
   "devDependencies": {
     "semver": "~2.2.1",
