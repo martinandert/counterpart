@@ -293,14 +293,11 @@ describe('translate', function() {
 
     describe('without a valid key as first argument', function() {
       it('throws an invalid argument error', function() {
-        assert.throws(function() { translate(); },            /invalid argument/);
-        assert.throws(function() { translate(null); },        /invalid argument/);
-        assert.throws(function() { translate(123); },         /invalid argument/);
-        assert.throws(function() { translate({}); },          /invalid argument/);
-        assert.throws(function() { translate(new Date()); },  /invalid argument/);
-        assert.throws(function() { translate(/./); },         /invalid argument/);
-        assert.throws(function() { translate([]); },          /invalid argument/);
-        assert.throws(function() { translate(''); },          /invalid argument/);
+        var keys = [null, 123, {}, new Date(), /./, [], ''];
+
+        for (var i = 0, ii = keys.length; i < ii; i++) {
+          assert.throws(function() { translate(keys[i]); }, /invalid argument/);
+        }
       });
     });
   });
@@ -684,6 +681,50 @@ describe('translate', function() {
       translate.registerTranslations('foo', { bing: { bong: 'beng' } });
       var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' }, bing: { bong: 'beng' } } };
       assert.deepEqual(translate.__registry.translations, expected);
+    });
+  });
+
+  describe('explicitly checking the examples of the README', function() {
+    it('passes all tests', function() {
+      translate.registerTranslations('en', {
+        damals: {
+          about_x_hours_ago: {
+            one:   'about one hour ago',
+            other: 'about %(count)s hours ago'
+          }
+        }
+      });
+
+      assert.deepEqual(translate('damals'), { about_x_hours_ago: { one: 'about one hour ago', other: 'about %(count)s hours ago' } });
+
+      assert.equal(translate('damals.about_x_hours_ago.one'),                    'about one hour ago');
+      assert.equal(translate(['damals', 'about_x_hours_ago', 'one']),            'about one hour ago');
+      assert.equal(translate(['damals', 'about_x_hours_ago.one']),               'about one hour ago');
+      assert.equal(translate('about_x_hours_ago.one', { scope: 'damals' }),      'about one hour ago');
+      assert.equal(translate('one', { scope: 'damals.about_x_hours_ago' }),      'about one hour ago');
+      assert.equal(translate('one', { scope: ['damals', 'about_x_hours_ago'] }), 'about one hour ago');
+
+      translate.registerTranslations('en', { foo: 'foo %(bar)s' });
+
+      assert.equal(translate('foo', { bar: 'baz' }), 'foo baz');
+
+      translate.registerTranslations('en', {
+        x_items: {
+          zero:  'No items.',
+          one:   'One item.',
+          other: '%(count)s items.'
+        }
+      });
+
+      assert.equal(translate('x_items', { count: 0  }), 'No items.');
+      assert.equal(translate('x_items', { count: 1  }), 'One item.');
+      assert.equal(translate('x_items', { count: 42 }), '42 items.');
+
+      assert.equal(translate('baz', { fallback: 'default' }), 'default');
+
+      translate.registerTranslations('de', JSON.parse('{"my_project": {"greeting": "Hallo, %(name)s!","x_items": {"one": "1 Stück", "other": "%(count)s Stücke"}}}'));
+
+      assert.equal(translate.withLocale('de', function() { return translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
     });
   });
 });

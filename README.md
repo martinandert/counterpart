@@ -36,8 +36,8 @@ Translation data is organized as a nested object using the top-level key as name
 { 
   damals: { 
     about_x_hours_ago: {
-      one:   "about one hour ago",
-      other: "about %(count)s hours ago"
+      one:   'about one hour ago',
+      other: 'about %(count)s hours ago'
     }
     /* ... */
   }
@@ -53,9 +53,9 @@ translate('damals')  // => { about_x_hours_ago: { one: '...', other: '...' } }
 The `key` argument can be either a single key, a dot-separated key or an array of keys or dot-separated keys. So these examples will all look up the same translation:
 
 ```js
-translate('damals.about_x_hours_ago.one')          // => "about one hour ago"
-translate(['damals', 'about_x_hours_ago', 'one'])  // => "about one hour ago"
-translate(['damals', 'about_x_hours_ago.one'])     // => "about one hour ago"
+translate('damals.about_x_hours_ago.one')          // => 'about one hour ago'
+translate(['damals', 'about_x_hours_ago', 'one'])  // => 'about one hour ago'
+translate(['damals', 'about_x_hours_ago.one'])     // => 'about one hour ago'
 ```
 
 The `scope` option can be either a single key, a dot-separated key or an array of keys or dot-separated keys. Keys and scopes can be combined freely. Again, these examples will all look up the same translation:
@@ -94,9 +94,9 @@ Translation data can contain pluralized translations. Pluralized translations ar
 Then use the `count` option to select a specific pluralization:
 
 ```js
-translate('x_items', { count: 0  })  // => "No items."
-translate('x_items', { count: 1  })  // => "One item."
-translate('x_items', { count: 42 })  // => "42 items."
+translate('x_items', { count: 0  })  // => 'No items.'
+translate('x_items', { count: 1  })  // => 'One item.'
+translate('x_items', { count: 42 })  // => '42 items.'
 ```
 
 Note that this library currently only supports an algorithm for English-like pluralization rules. Support for other algorithms is planned.
@@ -107,10 +107,10 @@ As seen above, the `count` option can be used both for pluralization and interpo
 
 If for a key no translation could be found, `translate` returns an error string of the form "translation missing: %(key)s". 
 
-To mitigate this, provide the `fallback` option with an alternate text. The following example returns the translation for "foo" or "default" if no translation was found:
+To mitigate this, provide the `fallback` option with an alternate text. The following example returns the translation for "baz" or "default" if no translation was found:
 
 ```js
-translate('foo', { fallback: 'default' })
+translate('baz', { fallback: 'default' })
 ```
 
 You can use interpolations with the `fallback` option, too.
@@ -178,7 +178,7 @@ The data object to merge should contain a namespace (e.g. the name of your app/l
 The translations are instantly made available:
 
 ```js
-translate("greeting", { scope: "my_project", name: "Martin" })  // => "Hallo, Martin!"
+translate('greeting', { scope: 'my_project', name: 'Martin' })  // => 'Hallo, Martin!'
 ```
 
 Note that library authors should preload their translations only for the default ("en") locale, since tools like [webpack](http://webpack.github.io/) or [browserify](http://browserify.org/) will recursively bundle up all the required modules of a library into a single file. This will include even unneeded translations and so unnecessarily bloat the bundle. 
