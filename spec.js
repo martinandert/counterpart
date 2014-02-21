@@ -25,7 +25,7 @@ describe('translate', function() {
         assert.doesNotThrow(function() { translate(['foo']); }, /invalid argument/);
       });
 
-      describe('with the default namespace present', function() {
+      describe('with the default scope present', function() {
         describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
             assert.equal(translate('foo'),          'missing translation: en.foo');
@@ -49,84 +49,84 @@ describe('translate', function() {
         });
       });
 
-      describe('with a different namespace present', function() {
+      describe('with a different scope present', function() {
         describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
-              assert.equal(translate('foo'),          'missing translation: other.en.foo');
-              assert.equal(translate('foo.bar'),      'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo']),        'missing translation: other.en.foo');
-              assert.equal(translate(['foo.bar']),    'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo', 'bar']), 'missing translation: other.en.foo.bar');
+            translate.withScope('other', function() {
+              assert.equal(translate('foo'),          'missing translation: en.other.foo');
+              assert.equal(translate('foo.bar'),      'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo']),        'missing translation: en.other.foo');
+              assert.equal(translate(['foo.bar']),    'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo', 'bar']), 'missing translation: en.other.foo.bar');
             });
           });
         });
 
         describe('with a different locale present', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
+            translate.withScope('other', function() {
               translate.withLocale('de', function() {
-                assert.equal(translate('foo'),          'missing translation: other.de.foo');
-                assert.equal(translate('foo.bar'),      'missing translation: other.de.foo.bar');
-                assert.equal(translate(['foo']),        'missing translation: other.de.foo');
-                assert.equal(translate(['foo.bar']),    'missing translation: other.de.foo.bar');
-                assert.equal(translate(['foo', 'bar']), 'missing translation: other.de.foo.bar');
+                assert.equal(translate('foo'),          'missing translation: de.other.foo');
+                assert.equal(translate('foo.bar'),      'missing translation: de.other.foo.bar');
+                assert.equal(translate(['foo']),        'missing translation: de.other.foo');
+                assert.equal(translate(['foo.bar']),    'missing translation: de.other.foo.bar');
+                assert.equal(translate(['foo', 'bar']), 'missing translation: de.other.foo.bar');
               });
             });
           });
         });
       });
 
-      describe('with the default namespace provided as option', function() {
+      describe('with the default scope provided as option', function() {
         describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
-            assert.equal(translate('foo', { namespace: null }),          'missing translation: en.foo');
-            assert.equal(translate('foo.bar', { namespace: null }),      'missing translation: en.foo.bar');
-            assert.equal(translate(['foo'], { namespace: null }),        'missing translation: en.foo');
-            assert.equal(translate(['foo.bar'], { namespace: null }),    'missing translation: en.foo.bar');
-            assert.equal(translate(['foo', 'bar'], { namespace: null }), 'missing translation: en.foo.bar');
+            assert.equal(translate('foo', { scope: null }),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar', { scope: null }),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo'], { scope: null }),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar'], { scope: null }),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { scope: null }), 'missing translation: en.foo.bar');
           });
         });
 
         describe('with a different locale present', function() {
           it('generates the correct normalized keys', function() {
             translate.withLocale('de', function() {
-              assert.equal(translate('foo', { namespace: null }),          'missing translation: de.foo');
-              assert.equal(translate('foo.bar', { namespace: null }),      'missing translation: de.foo.bar');
-              assert.equal(translate(['foo'], { namespace: null }),        'missing translation: de.foo');
-              assert.equal(translate(['foo.bar'], { namespace: null }),    'missing translation: de.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { namespace: null }), 'missing translation: de.foo.bar');
+              assert.equal(translate('foo', { scope: null }),          'missing translation: de.foo');
+              assert.equal(translate('foo.bar', { scope: null }),      'missing translation: de.foo.bar');
+              assert.equal(translate(['foo'], { scope: null }),        'missing translation: de.foo');
+              assert.equal(translate(['foo.bar'], { scope: null }),    'missing translation: de.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { scope: null }), 'missing translation: de.foo.bar');
             });
           });
         });
       });
 
-      describe('with a different namespace provided as option', function() {
+      describe('with a different scope provided as option', function() {
         describe('with the default locale present', function() {
           it('generates the correct normalized keys', function() {
-            assert.equal(translate('foo', { namespace: 'other' }),          'missing translation: other.en.foo');
-            assert.equal(translate('foo.bar', { namespace: 'other' }),      'missing translation: other.en.foo.bar');
-            assert.equal(translate(['foo'], { namespace: 'other' }),        'missing translation: other.en.foo');
-            assert.equal(translate(['foo.bar'], { namespace: 'other' }),    'missing translation: other.en.foo.bar');
-            assert.equal(translate(['foo', 'bar'], { namespace: 'other' }), 'missing translation: other.en.foo.bar');
+            assert.equal(translate('foo', { scope: 'other' }),          'missing translation: en.other.foo');
+            assert.equal(translate('foo.bar', { scope: 'other' }),      'missing translation: en.other.foo.bar');
+            assert.equal(translate(['foo'], { scope: 'other' }),        'missing translation: en.other.foo');
+            assert.equal(translate(['foo.bar'], { scope: 'other' }),    'missing translation: en.other.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { scope: 'other' }), 'missing translation: en.other.foo.bar');
           });
         });
 
         describe('with a different locale present', function() {
           it('generates the correct normalized keys', function() {
             translate.withLocale('de', function() {
-              assert.equal(translate('foo', { namespace: 'other' }),          'missing translation: other.de.foo');
-              assert.equal(translate('foo.bar', { namespace: 'other' }),      'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo'], { namespace: 'other' }),        'missing translation: other.de.foo');
-              assert.equal(translate(['foo.bar'], { namespace: 'other' }),    'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { namespace: 'other' }), 'missing translation: other.de.foo.bar');
+              assert.equal(translate('foo', { scope: 'other' }),          'missing translation: de.other.foo');
+              assert.equal(translate('foo.bar', { scope: 'other' }),      'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo'], { scope: 'other' }),        'missing translation: de.other.foo');
+              assert.equal(translate(['foo.bar'], { scope: 'other' }),    'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { scope: 'other' }), 'missing translation: de.other.foo.bar');
             });
           });
         });
       });
 
       describe('with the default locale provided as option', function() {
-        describe('with the default namespace present', function() {
+        describe('with the default scope present', function() {
           it('generates the correct normalized keys', function() {
             assert.equal(translate('foo', { locale: 'en' }),          'missing translation: en.foo');
             assert.equal(translate('foo.bar', { locale: 'en' }),      'missing translation: en.foo.bar');
@@ -136,21 +136,21 @@ describe('translate', function() {
           });
         });
 
-        describe('with a different namespace present', function() {
+        describe('with a different scope present', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
-              assert.equal(translate('foo', { locale: 'en' }),          'missing translation: other.en.foo');
-              assert.equal(translate('foo.bar', { locale: 'en' }),      'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo'], { locale: 'en' }),        'missing translation: other.en.foo');
-              assert.equal(translate(['foo.bar'], { locale: 'en' }),    'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { locale: 'en' }), 'missing translation: other.en.foo.bar');
+            translate.withScope('other', function() {
+              assert.equal(translate('foo', { locale: 'en' }),          'missing translation: en.other.foo');
+              assert.equal(translate('foo.bar', { locale: 'en' }),      'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'en' }),        'missing translation: en.other.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'en' }),    'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'en' }), 'missing translation: en.other.foo.bar');
             });
           });
         });
       });
 
       describe('with a different locale provided as option', function() {
-        describe('with the default namespace present', function() {
+        describe('with the default scope present', function() {
           it('generates the correct normalized keys', function() {
             assert.equal(translate('foo', { locale: 'de' }),          'missing translation: de.foo');
             assert.equal(translate('foo.bar', { locale: 'de' }),      'missing translation: de.foo.bar');
@@ -160,62 +160,62 @@ describe('translate', function() {
           });
         });
 
-        describe('with a different namespace present', function() {
+        describe('with a different scope present', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
-              assert.equal(translate('foo', { locale: 'de' }),          'missing translation: other.de.foo');
-              assert.equal(translate('foo.bar', { locale: 'de' }),      'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo'], { locale: 'de' }),        'missing translation: other.de.foo');
-              assert.equal(translate(['foo.bar'], { locale: 'de' }),    'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { locale: 'de' }), 'missing translation: other.de.foo.bar');
+            translate.withScope('other', function() {
+              assert.equal(translate('foo', { locale: 'de' }),          'missing translation: de.other.foo');
+              assert.equal(translate('foo.bar', { locale: 'de' }),      'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'de' }),        'missing translation: de.other.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'de' }),    'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'de' }), 'missing translation: de.other.foo.bar');
             });
           });
         });
       });
 
       describe('with the default locale provided as option', function() {
-        describe('with the default namespace provided as option', function() {
+        describe('with the default scope provided as option', function() {
           it('generates the correct normalized keys', function() {
-            assert.equal(translate('foo', { locale: 'en', namespace: null }),          'missing translation: en.foo');
-            assert.equal(translate('foo.bar', { locale: 'en', namespace: null }),      'missing translation: en.foo.bar');
-            assert.equal(translate(['foo'], { locale: 'en', namespace: null }),        'missing translation: en.foo');
-            assert.equal(translate(['foo.bar'], { locale: 'en', namespace: null }),    'missing translation: en.foo.bar');
-            assert.equal(translate(['foo', 'bar'], { locale: 'en', namespace: null }), 'missing translation: en.foo.bar');
+            assert.equal(translate('foo', { locale: 'en', scope: null }),          'missing translation: en.foo');
+            assert.equal(translate('foo.bar', { locale: 'en', scope: null }),      'missing translation: en.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'en', scope: null }),        'missing translation: en.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'en', scope: null }),    'missing translation: en.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'en', scope: null }), 'missing translation: en.foo.bar');
           });
         });
 
-        describe('with a different namespace provided as option', function() {
+        describe('with a different scope provided as option', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
-              assert.equal(translate('foo', { locale: 'en', namespace: 'other' }),          'missing translation: other.en.foo');
-              assert.equal(translate('foo.bar', { locale: 'en', namespace: 'other' }),      'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo'], { locale: 'en', namespace: 'other' }),        'missing translation: other.en.foo');
-              assert.equal(translate(['foo.bar'], { locale: 'en', namespace: 'other' }),    'missing translation: other.en.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { locale: 'en', namespace: 'other' }), 'missing translation: other.en.foo.bar');
+            translate.withScope('other', function() {
+              assert.equal(translate('foo', { locale: 'en', scope: 'other' }),          'missing translation: en.other.foo');
+              assert.equal(translate('foo.bar', { locale: 'en', scope: 'other' }),      'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'en', scope: 'other' }),        'missing translation: en.other.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'en', scope: 'other' }),    'missing translation: en.other.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'en', scope: 'other' }), 'missing translation: en.other.foo.bar');
             });
           });
         });
       });
 
       describe('with a different locale provided as option', function() {
-        describe('with the default namespace provided as option', function() {
+        describe('with the default scope provided as option', function() {
           it('generates the correct normalized keys', function() {
-            assert.equal(translate('foo', { locale: 'de', namespace: null }),          'missing translation: de.foo');
-            assert.equal(translate('foo.bar', { locale: 'de', namespace: null }),      'missing translation: de.foo.bar');
-            assert.equal(translate(['foo'], { locale: 'de', namespace: null }),        'missing translation: de.foo');
-            assert.equal(translate(['foo.bar'], { locale: 'de', namespace: null }),    'missing translation: de.foo.bar');
-            assert.equal(translate(['foo', 'bar'], { locale: 'de', namespace: null }), 'missing translation: de.foo.bar');
+            assert.equal(translate('foo', { locale: 'de', scope: null }),          'missing translation: de.foo');
+            assert.equal(translate('foo.bar', { locale: 'de', scope: null }),      'missing translation: de.foo.bar');
+            assert.equal(translate(['foo'], { locale: 'de', scope: null }),        'missing translation: de.foo');
+            assert.equal(translate(['foo.bar'], { locale: 'de', scope: null }),    'missing translation: de.foo.bar');
+            assert.equal(translate(['foo', 'bar'], { locale: 'de', scope: null }), 'missing translation: de.foo.bar');
           });
         });
 
-        describe('with a different namespace provided as option', function() {
+        describe('with a different scope provided as option', function() {
           it('generates the correct normalized keys', function() {
-            translate.withNamespace('other', function() {
-              assert.equal(translate('foo', { locale: 'de', namespace: 'other' }),          'missing translation: other.de.foo');
-              assert.equal(translate('foo.bar', { locale: 'de', namespace: 'other' }),      'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo'], { locale: 'de', namespace: 'other' }),        'missing translation: other.de.foo');
-              assert.equal(translate(['foo.bar'], { locale: 'de', namespace: 'other' }),    'missing translation: other.de.foo.bar');
-              assert.equal(translate(['foo', 'bar'], { locale: 'de', namespace: 'other' }), 'missing translation: other.de.foo.bar');
+            translate.withScope('other', function() {
+              assert.equal(translate('foo', { locale: 'de', scope: 'other' }),          'missing translation: de.other.foo');
+              assert.equal(translate('foo.bar', { locale: 'de', scope: 'other' }),      'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo'], { locale: 'de', scope: 'other' }),        'missing translation: de.other.foo');
+              assert.equal(translate(['foo.bar'], { locale: 'de', scope: 'other' }),    'missing translation: de.other.foo.bar');
+              assert.equal(translate(['foo', 'bar'], { locale: 'de', scope: 'other' }), 'missing translation: de.other.foo.bar');
             });
           });
         });
@@ -225,29 +225,31 @@ describe('translate', function() {
         it('returns that translation', function() {
           translate.__registry.translations = { foo: { bar: { baz: { bam: 'boo' } } } };
 
-          assert.equal(translate('baz.bam', { namespace: 'foo', locale: 'bar' }),           'boo');
-          assert.equal(translate('.baz..bam...', { namespace: 'foo', locale: 'bar' }),      'boo');
-          assert.equal(translate(['baz.bam'], { namespace: 'foo', locale: 'bar' }),         'boo');
-          assert.equal(translate(['baz', 'bam'], { namespace: 'foo', locale: 'bar' }),      'boo');
-          assert.equal(translate(['baz', '', 'bam'], { namespace: 'foo', locale: 'bar' }),  'boo');
+          assert.equal(translate('baz.bam', { locale: 'foo', scope: 'bar' }),           'boo');
+          assert.equal(translate('.baz..bam...', { locale: 'foo', scope: 'bar' }),      'boo');
+          assert.equal(translate(['baz.bam'], { locale: 'foo', scope: 'bar' }),         'boo');
+          assert.equal(translate(['baz', 'bam'], { locale: 'foo', scope: 'bar' }),      'boo');
+          assert.equal(translate(['baz', '', 'bam'], { locale: 'foo', scope: 'bar' }),  'boo');
         });
 
         describe('with a `count` provided as option', function() {
           it('correctly pluralizes the translated value', function() {
             translate.__registry.translations = { foo: { bar: { baz: { zero: 'no items', one: 'one item', other: '%(count)s items' } } } };
 
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 0 }),   'no items');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 1 }),   'one item');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 2 }),   '2 items');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', count: 42 }),  '42 items');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', count: 0 }),   'no items');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', count: 1 }),   'one item');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', count: 2 }),   '2 items');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', count: 42 }),  '42 items');
           });
         });
 
         describe('with other options provided', function() {
           it('interpolates these options into the translated value', function() {
-            translate.__registry.translations = { foo: { bar: { baz: '1 %(a)s 2 %(b)s 3' } } };
+            translate.__registry.translations = { foo: { bar: { baz: 'Hi %(name)s! See you %(when)s!' } } };
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', name: 'Paul', when: 'later', where: 'home' }), 'Hi Paul! See you later!');
 
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', b: 5, a: 4, c: 6 }), '1 4 2 5 3');
+            translate.__registry.translations = { foo: { bar: { baz: 'Hello %(users[0].name)s and %(users[1].name)s!' } } };
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', users: [{ name: 'Molly' }, { name: 'Polly' }] }), 'Hello Molly and Polly!');
           });
         });
       });
@@ -256,7 +258,7 @@ describe('translate', function() {
         it('returns the remaining translation part', function() {
           translate.__registry.translations = { foo: { bar: { baz: { zero: 'no items', one: 'one item', other: '%(count)s items' } } } };
 
-          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), { zero: 'no items', one: 'one item', other: '%(count)s items' });
+          assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar' }), { zero: 'no items', one: 'one item', other: '%(count)s items' });
         });
       });
 
@@ -264,26 +266,26 @@ describe('translate', function() {
         it('returns the array that key points to', function() {
           translate.__registry.translations = { foo: { bar: { baz: [1, 'A', 0.42] } } };
 
-          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), [1, 'A', 0.42]);
+          assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar' }), [1, 'A', 0.42]);
         });
       });
 
       describe('without a translation for the key present', function() {
-        it('returns a string "missing translation: %(namespace).%(locale).%(key)"', function() {
-          assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar' }), 'missing translation: foo.bar.baz');
+        it('returns a string "missing translation: %(locale).%(scope).%(key)"', function() {
+          assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar' }), 'missing translation: foo.bar.baz');
         });
 
         describe('with a `fallback` provided as option', function() {
           it('returns the fallback', function() {
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: 'boom' }), 'boom');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: 'Hello, %(name)s!', name: 'Martin' }), 'Hello, Martin!');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: 'boom' }), 'boom');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: 'Hello, %(name)s!', name: 'Martin' }), 'Hello, Martin!');
 
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 0 }), 'no items');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 1 }), 'one item');
-            assert.equal(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 0 }), 'no items');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 1 }), 'one item');
+            assert.equal(translate('baz', { locale: 'foo', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
 
-            assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar', fallback: { oh: 'yeah' } }), { oh: 'yeah' });
-            assert.deepEqual(translate('baz', { namespace: 'foo', locale: 'bar', fallback: [1, 'A', 0.42] }), [1, 'A', 0.42]);
+            assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: { oh: 'yeah' } }), { oh: 'yeah' });
+            assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: [1, 'A', 0.42] }), [1, 'A', 0.42]);
           });
         });
       });
@@ -403,29 +405,29 @@ describe('translate', function() {
     });
   });
 
-  describe('#withNamespace', function() {
+  describe('#withScope', function() {
     it('is a function', function() {
-      assert.isFunction(translate.withNamespace);
+      assert.isFunction(translate.withScope);
     });
 
-    it('temporarily changes the current namespace within the callback', function() {
-      var namespace = translate.__registry.namespace;
+    it('temporarily changes the current scope within the callback', function() {
+      var scope = translate.__registry.scope;
 
-      translate.withNamespace(namespace + 'x', function() {
-        assert.equal(translate.__registry.namespace, namespace + 'x');
+      translate.withScope(scope + 'x', function() {
+        assert.equal(translate.__registry.scope, scope + 'x');
       });
 
-      assert.equal(translate.__registry.namespace, namespace);
+      assert.equal(translate.__registry.scope, scope);
     });
 
     it('allows a custom callback context to be set', function() {
-      translate.withNamespace('foo', function() {
+      translate.withScope('foo', function() {
         assert.equal(this.bar, 'baz');
       }, { bar: 'baz' })
     });
 
     it('returns the return value of the callback', function() {
-      var result = translate.withNamespace('foo', function() { return 'bar'; });
+      var result = translate.withScope('foo', function() { return 'bar'; });
       assert.equal(result, 'bar');
     });
   });
@@ -658,11 +660,10 @@ describe('translate', function() {
     });
 
     it('returns the passed arguments as an object structure', function() {
-      var namespace = 'foo';
-      var locale    = 'bar';
-      var data      = { baz: 'bingo' };
+      var locale = 'foo';
+      var data   = { bar: { baz: 'bingo' } };
 
-      var actual = translate.registerTranslations(namespace, locale, data);
+      var actual = translate.registerTranslations(locale, data);
 
       var expected = { foo: { bar: { baz: 'bingo' }}};
 
@@ -672,15 +673,15 @@ describe('translate', function() {
     it('merges the passed arguments correctly into the registry', function() {
       translate.__registry.translations = {};
 
-      translate.registerTranslations('foo', 'bar', { baz: 'bingo' });
+      translate.registerTranslations('foo', { bar: { baz: 'bingo' } });
       var expected = { foo: { bar: { baz: 'bingo' } } };
       assert.deepEqual(translate.__registry.translations, expected);
 
-      translate.registerTranslations('foo', 'bar', { bam: 'boo' });
+      translate.registerTranslations('foo', { bar: { bam: 'boo' } });
       var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' } } };
       assert.deepEqual(translate.__registry.translations, expected);
 
-      translate.registerTranslations('foo', 'bing', { bong: 'beng' });
+      translate.registerTranslations('foo', { bing: { bong: 'beng' } });
       var expected = { foo: { bar: { baz: 'bingo', bam: 'boo' }, bing: { bong: 'beng' } } };
       assert.deepEqual(translate.__registry.translations, expected);
     });

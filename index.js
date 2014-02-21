@@ -10,11 +10,11 @@ var events  = require('events');
 var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
 
-var translationNamespace = 'globalization';
+var translationScope = 'globalization';
 
 var registry = global.__g11n = global.__g11n || {
   locale: 'en',
-  namespace: null,
+  scope: null,
   translations: {},
   normalizedKeys: {}
 };
@@ -34,14 +34,10 @@ function setLocale(value) {
   return previous;
 }
 
-function registerTranslations(namespace, locale, data) {
+function registerTranslations(locale, data) {
   var translations = {};
-
-  translations[namespace] = {};
-  translations[namespace][locale] = data;
-
+  translations[locale] = data;
   extend(true, registry.translations, translations);
-
   return translations;
 }
 
@@ -60,13 +56,13 @@ function translate(key, options) {
 
   options = options || {};
 
-  var namespace = options.namespace || registry.namespace;
-  delete options.namespace;
-
   var locale = options.locale || registry.locale;
   delete options.locale;
 
-  var keys = normalizeKeys(namespace, locale, key);
+  var scope = options.scope || registry.scope;
+  delete options.scope;
+
+  var keys = normalizeKeys(locale, scope, key);
 
   var entry = keys.reduce(function(result, key) {
     if (typeof result === 'object' && result !== null && key in result) {
@@ -97,22 +93,22 @@ function localize(object, options) {
 
   options = options || {};
 
-  var namespace = options.namespace || translationNamespace;
-  var locale    = options.locale    || registry.locale;
-  var type      = options.type      || 'datetime';
-  var format    = options.format    || 'default';
+  var locale  = options.locale  || registry.locale;
+  var scope   = options.scope   || translationScope;
+  var type    = options.type    || 'datetime';
+  var format  = options.format  || 'default';
 
-  format  = translate(['formats', type, format], { namespace: namespace, locale: locale });
-  options = { namespace: namespace, locale: locale };
+  options = { locale: locale, scope: scope };
+  format  = translate(['formats', type, format], extend(true, {}, options));
 
   return strftime(object, format, translate('names', options));
 }
 
-function normalizeKeys(namespace, locale, key) {
+function normalizeKeys(locale, scope, key) {
   var keys = [];
 
-  keys = keys.concat(normalizeKey(namespace));
   keys = keys.concat(normalizeKey(locale));
+  keys = keys.concat(normalizeKey(scope));
   keys = keys.concat(normalizeKey(key));
 
   return keys;
@@ -176,15 +172,15 @@ function withLocale(locale, callback, context) {
   return result;
 }
 
-function withNamespace(namespace, callback, context) {
-  var previous = registry.namespace;
-  registry.namespace = namespace;
+function withScope(scope, callback, context) {
+  var previous = registry.scope;
+  registry.scope = scope;
   var result = context ? callback.call(context) : callback();
-  registry.namespace = previous;
+  registry.scope = previous;
   return result;
 }
 
-registerTranslations(translationNamespace, 'en', require('./locales/en'));
+registerTranslations('en', require('./locales/en'));
 
 module.exports = translate;
 
@@ -192,7 +188,7 @@ module.exports.setLocale            = setLocale;
 module.exports.getLocale            = getLocale;
 module.exports.localize             = localize;
 module.exports.withLocale           = withLocale;
-module.exports.withNamespace        = withNamespace;
+module.exports.withScope            = withScope;
 module.exports.registerTranslations = registerTranslations;
 module.exports.onLocaleChange       = addLocaleChangeListener;
 module.exports.offLocaleChange      = removeLocaleChangeListener;
