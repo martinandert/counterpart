@@ -54,7 +54,7 @@ function translate(key, options) {
     throw new Error('invalid argument: key');
   }
 
-  options = options || {};
+  options = extend(true, {}, options);
 
   var locale = options.locale || registry.locale;
   delete options.locale;
@@ -94,7 +94,7 @@ function localize(object, options) {
     throw new Error('invalid argument: object must be a date');
   }
 
-  options = options || {};
+  options = extend(true, {}, options);
 
   var locale  = options.locale  || registry.locale;
   var scope   = options.scope   || translationScope;

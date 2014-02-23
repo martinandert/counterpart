@@ -86,6 +86,14 @@ describe('translate', function() {
         });
       });
 
+      describe('with options provided', function() {
+        it('does not mutate these options', function() {
+          var options = { locale: 'en', scope: ['foo1', 'foo2'], count: 3, bar: { baz: 'bum' } };
+          translate('boing', options);
+          assert.deepEqual(options, { locale: 'en', scope: ['foo1', 'foo2'], count: 3, bar: { baz: 'bum' } });
+        });
+      });
+
       describe('with a translation for the key present', function() {
         it('returns that translation', function() {
           translate.registerTranslations('en', { foo: { bar: { baz: { bam: 'boo' } } } });
@@ -400,6 +408,12 @@ describe('translate', function() {
 
     it('is a function', function() {
       assert.isFunction(translate.localize);
+    });
+
+    it('does not mutate these options', function() {
+      var options = { locale: 'en', scope: ['foo1', 'foo2'], count: 3, bar: { baz: 'bum' } };
+      translate.localize(new Date(), options);
+      assert.deepEqual(options, { locale: 'en', scope: ['foo1', 'foo2'], count: 3, bar: { baz: 'bum' } });
     });
 
     describe('when called without a date as first argument', function() {
