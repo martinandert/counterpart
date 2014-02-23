@@ -127,12 +127,21 @@ describe('translate', function() {
         });
 
         describe('with other options provided', function() {
-          it('interpolates these options into the translated value', function() {
-            translate.registerTranslations('en', { foo: 'Hi %(name)s! See you %(when)s!' });
-            assert.equal(translate('foo', { name: 'Paul', when: 'later', where: 'home' }), 'Hi Paul! See you later!');
+          describe('by default', function() {
+            it('interpolates these options into the translated value', function() {
+              translate.registerTranslations('en', { foo: 'Hi %(name)s! See you %(when)s!' });
+              assert.equal(translate('foo', { name: 'Paul', when: 'later', where: 'home' }), 'Hi Paul! See you later!');
 
-            translate.registerTranslations('en', { foo: 'Hello %(users[0].name)s and %(users[1].name)s!' });
-            assert.equal(translate('foo', { users: [{ name: 'Molly' }, { name: 'Polly' }] }), 'Hello Molly and Polly!');
+              translate.registerTranslations('en', { foo: 'Hello %(users[0].name)s and %(users[1].name)s!' });
+              assert.equal(translate('foo', { users: [{ name: 'Molly' }, { name: 'Polly' }] }), 'Hello Molly and Polly!');
+            });
+          });
+
+          describe('with the `interpolate` options set to `false`', function() {
+            it('interpolates these options into the translated value', function() {
+              translate.registerTranslations('en', { foo: 'Hi %(name)s! See you %(when)s!' });
+              assert.equal(translate('foo', { interpolate: false, name: 'Paul', when: 'later', where: 'home' }), 'Hi %(name)s! See you %(when)s!');
+            });
           });
         });
       });

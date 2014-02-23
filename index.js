@@ -81,7 +81,10 @@ function translate(key, options) {
   }
 
   entry = pluralize(locale, entry, options.count);
-  entry = interpolate(entry, options);
+
+  if (options.interpolate !== false) {
+    entry = interpolate(entry, options);
+  }
 
   return entry;
 }
