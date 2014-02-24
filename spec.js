@@ -228,6 +228,12 @@ describe('translate', function() {
     });
   });
 
+  describe('#translate', function() {
+    it('maps to the exported function', function() {
+      assert.strictEqual(translate.translate, translate);
+    });
+  });
+
   describe('#getLocale', function() {
     it('is a function', function() {
       assert.isFunction(translate.getLocale);

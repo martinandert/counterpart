@@ -187,6 +187,7 @@ module.exports = translate;
 
 module.exports.setLocale            = setLocale;
 module.exports.getLocale            = getLocale;
+module.exports.translate            = translate;
 module.exports.localize             = localize;
 module.exports.withLocale           = withLocale;
 module.exports.withScope            = withScope;
