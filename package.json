@@ -1,6 +1,6 @@
 {
   "name": "globalization",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "A translation and localization library for Node.js and the browser",
   "main": "index.js",
   "repository": {
