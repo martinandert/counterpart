@@ -1,8 +1,8 @@
 // The translations in this file can be added with:
-//   #registerTranslations('de', require('globalization/locales/de');
+//   #registerTranslations('de', require('counterpart/locales/de');
 
 module.exports = {
-  globalization: {
+  counterpart: {
     names: require('date-names/de'),
     pluralize: require('pluralizers/de'),
 

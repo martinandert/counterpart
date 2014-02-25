@@ -1,7 +1,7 @@
 // The translations in this file are added by default.
 
 module.exports = {
-  globalization: {
+  counterpart: {
     names: require('date-names/en'),
     pluralize: require('pluralizers/en'),
 

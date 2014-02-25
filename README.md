@@ -1,4 +1,4 @@
-# globalization
+# counterpart
 
 A translation and localization library for Node.js and the browser. The project is inspired by Ruby's famous [I18n gem](https://github.com/svenfuchs/i18n).
 
@@ -14,16 +14,16 @@ Features:
 Install via npm:
 
 ```bash
-% npm install globalization
+% npm install counterpart
 ```
 
 
 ## Usage
 
-Require the globalization module to get a reference to the `translate` function:
+Require the counterpart module to get a reference to the `translate` function:
 
 ```js
-var translate = require('globalization');
+var translate = require('counterpart');
 ```
 
 This function expects a `key` and `options` as arguments and translates, pluralizes and interpolates a given key using a given locale, scope, and fallback, as well as interpolation values.
@@ -99,7 +99,7 @@ translate('x_items', { count: 1  })  // => 'One item.'
 translate('x_items', { count: 42 })  // => '42 items.'
 ```
 
-Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding custom translation data](#adding-translation-data) to the "globalization" namespace. Pull requests are welcome.
+Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding custom translation data](#adding-translation-data) to the "counterpart" namespace. Pull requests are welcome.
 
 As seen above, the `count` option can be used both for pluralization and interpolation.
 
@@ -125,7 +125,7 @@ translate.setLocale('de') // => 'en' (returns the previous locale)
 translate.getLocale()     // => 'de'
 ```
 
-Note that it is advised to call `setLocale` only once at the start of the application or when the user changes her language preference. A library author integrating the globalization package in a library should not call `setLocale` at all and leave that to the developer incorporating the library.
+Note that it is advised to call `setLocale` only once at the start of the application or when the user changes her language preference. A library author integrating the counterpart package in a library should not call `setLocale` at all and leave that to the developer incorporating the library.
 
 In case of a locale change, the `setLocale` function emits an event you can listen to:
 
@@ -158,7 +158,7 @@ There is also a `withScope` function that works exactly the same as `withLocale`
 You can use the `registerTranslations` function to deep-merge data for a specific locale into the global translation object:
 
 ```js
-translate.registerTranslations('de', require('globalization/locales/de'));
+translate.registerTranslations('de', require('counterpart/locales/de'));
 translate.registerTranslations('de', require('./locales/de.json'));
 ```
 
@@ -188,12 +188,12 @@ Instead, you as a library author should advise end-users to on-demand-load trans
 
 ```js
 // Execute this code to load the 'de' translations:
-require('globalization').registerTranslations('de', require('my_package/locales/de'));
+require('counterpart').registerTranslations('de', require('my_package/locales/de'));
 ```
 
 ### Localization
 
-The globalization package comes with support for localizing JavaScript Date objects. The `localize` function expects a date and options as arguments. The following example demonstrates the possible options.
+The counterpart package comes with support for localizing JavaScript Date objects. The `localize` function expects a date and options as arguments. The following example demonstrates the possible options.
 
 ```js
 var date = new Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
@@ -210,11 +210,11 @@ translate.localize(date, { type: 'time' })                  // => '13:46'
 translate.localize(date, { type: 'time', format: 'short' }) // => '13:46'
 translate.localize(date, { type: 'time', format: 'long' })  // => '13:46:24 +01:00'
 
-translate.registerTranslations('de', require('globalization/locales/de'));
+translate.registerTranslations('de', require('counterpart/locales/de'));
 translate.localize(date, { locale: 'de' })  // => 'Fr, 21. Feb 2014, 13:46 Uhr'
 ```
 
-Sure, you can integrate custom localizations by adding to or overwriting the "globalization" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
+Sure, you can integrate custom localizations by adding to or overwriting the "counterpart" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
 
 
 ## Contributing

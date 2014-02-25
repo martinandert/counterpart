@@ -10,9 +10,9 @@ var events  = require('events');
 var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
 
-var translationScope = 'globalization';
+var translationScope = 'counterpart';
 
-var registry = global.__g11n = global.__g11n || {
+var registry = global.__counterpart = global.__counterpart || {
   locale: 'en',
   scope: null,
   translations: {},
