@@ -168,7 +168,7 @@ function interpolate(entry, values) {
 function withLocale(locale, callback, context) {
   var previous = registry.locale;
   registry.locale = locale;
-  var result = context ? callback.call(context) : callback();
+  var result = callback.call(context);
   registry.locale = previous;
   return result;
 }
@@ -176,7 +176,7 @@ function withLocale(locale, callback, context) {
 function withScope(scope, callback, context) {
   var previous = registry.scope;
   registry.scope = scope;
-  var result = context ? callback.call(context) : callback();
+  var result = callback.call(context);
   registry.scope = previous;
   return result;
 }
