@@ -1,4 +1,4 @@
-# counterpart
+# Counterpart
 
 A translation and localization library for Node.js and the browser. The project is inspired by Ruby's famous [I18n gem](https://github.com/svenfuchs/i18n).
 
@@ -193,9 +193,9 @@ require('counterpart').registerTranslations('de', require('my_package/locales/de
 
 ### Registering Default Interpolations
 
-Since v0.11.0, Counterpart allows you to register default interpolations using the `registerInterpolations` function. Here is an example:
+Since v0.11, Counterpart allows you to register default interpolations using the `registerInterpolations` function. Here is an example:
 
-```
+```js
 translate.registerTranslations('en', { 
   my_namespace: { 
     greeting: 'Welcome to %(app_name)s, %(visitor)s!'
