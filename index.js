@@ -16,6 +16,7 @@ var registry = global.__counterpart = global.__counterpart || {
   locale: 'en',
   scope: null,
   translations: {},
+  interpolations: {},
   normalizedKeys: {}
 };
 
@@ -39,6 +40,10 @@ function registerTranslations(locale, data) {
   translations[locale] = data;
   extend(true, registry.translations, translations);
   return translations;
+}
+
+function registerInterpolations(data) {
+  return extend(true, registry.interpolations, data);
 }
 
 function addLocaleChangeListener(callback) {
@@ -162,7 +167,7 @@ function interpolate(entry, values) {
     return entry;
   }
 
-  return sprintf(entry, values);
+  return sprintf(entry, extend(registry.interpolations, values));
 }
 
 function withLocale(locale, callback, context) {
@@ -185,15 +190,16 @@ registerTranslations('en', require('./locales/en'));
 
 module.exports = translate;
 
-module.exports.setLocale            = setLocale;
-module.exports.getLocale            = getLocale;
-module.exports.translate            = translate;
-module.exports.localize             = localize;
-module.exports.withLocale           = withLocale;
-module.exports.withScope            = withScope;
-module.exports.registerTranslations = registerTranslations;
-module.exports.onLocaleChange       = addLocaleChangeListener;
-module.exports.offLocaleChange      = removeLocaleChangeListener;
+module.exports.translate              = translate;
+module.exports.setLocale              = setLocale;
+module.exports.getLocale              = getLocale;
+module.exports.localize               = localize;
+module.exports.withLocale             = withLocale;
+module.exports.withScope              = withScope;
+module.exports.registerTranslations   = registerTranslations;
+module.exports.registerInterpolations = registerInterpolations;
+module.exports.onLocaleChange         = addLocaleChangeListener;
+module.exports.offLocaleChange        = removeLocaleChangeListener;
 
 if (process.env.NODE_ENV !== 'production') {
   module.exports.__registry = registry;

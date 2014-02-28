@@ -143,6 +143,18 @@ describe('translate', function() {
               translate.registerTranslations('en', { foo: 'Hello %(users[0].name)s and %(users[1].name)s!' });
               assert.equal(translate('foo', { users: [{ name: 'Molly' }, { name: 'Polly' }] }), 'Hello Molly and Polly!');
             });
+
+            it('interpolates the registered interpolations into the translated value', function() {
+              var current = translate.__registry.interpolations;
+
+              translate.registerInterpolations({ app_name: 'My Cool App', question: 'How are you today?' });
+              translate.registerTranslations('en', { greeting: 'Welcome to %(app_name)s, %(name)s! %(question)s' });
+
+              assert.equal(translate('greeting', { name: 'Martin' }), 'Welcome to My Cool App, Martin! How are you today?');
+              assert.equal(translate('greeting', { name: 'Martin', app_name: 'The Foo App' }), 'Welcome to The Foo App, Martin! How are you today?');
+
+              translate.__registry.interpolations = current;
+            });
           });
 
           describe('with the `interpolate` options set to `false`', function() {
@@ -757,6 +769,25 @@ describe('translate', function() {
     });
   });
 
+  describe('#registerInterpolations', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.registerInterpolations);
+    });
+
+    it('merges the passed arguments correctly into the registry', function() {
+      translate.__registry.interpolations = {};
+
+      translate.registerInterpolations({ foo: 'yes', bar: 'no' });
+      assert.deepEqual(translate.__registry.interpolations, { foo: 'yes', bar: 'no' });
+
+      translate.registerInterpolations({ baz: 'hey' });
+      assert.deepEqual(translate.__registry.interpolations, { foo: 'yes', bar: 'no', baz: 'hey' });
+
+      // clean up
+      translate.__registry.interpolations = {};
+    });
+  });
+
   describe('explicitly checking the examples of the README', function() {
     it('passes all tests', function() {
       translate.registerTranslations('en', {
@@ -816,6 +847,17 @@ describe('translate', function() {
       assert.equal(translate.localize(date, { type: 'time', format: 'long' })  , '13:46:24 +01:00');
 
       assert.equal(translate.localize(date, { locale: 'de' })  , 'Fr, 21. Feb 2014, 13:46 Uhr');
+
+      translate.registerTranslations('en', {
+        my_namespace: {
+          greeting: 'Welcome to %(app_name)s, %(visitor)s!'
+        }
+      });
+
+      translate.registerInterpolations({ app_name: 'My Cool App' });
+
+      assert.equal(translate('my_namespace.greeting', { visitor: 'Martin' }), 'Welcome to My Cool App, Martin!');
+      assert.equal(translate('my_namespace.greeting', { visitor: 'Martin', app_name: 'The Foo App' }), 'Welcome to The Foo App, Martin!');
     });
   });
 });

@@ -191,6 +191,28 @@ Instead, you as a library author should advise end-users to on-demand-load trans
 require('counterpart').registerTranslations('de', require('my_package/locales/de'));
 ```
 
+### Registering Default Interpolations
+
+Since v0.11.0, Counterpart allows you to register default interpolations using the `registerInterpolations` function. Here is an example:
+
+```
+translate.registerTranslations('en', { 
+  my_namespace: { 
+    greeting: 'Welcome to %(app_name)s, %(visitor)s!'
+  }
+});
+
+translate.registerInterpolations({ app_name: 'My Cool App' });
+
+translate('my_namespace.greeting', { visitor: 'Martin' })
+// => 'Welcome to My Cool App, Martin!'
+
+translate('my_namespace.greeting', { visitor: 'Martin', app_name: 'The Foo App' })
+// => 'Welcome to The Foo App, Martin!'
+```
+
+As you can see in the last line of the example, interpolations you give as options to the `translate` function take precedence over registered interpolations.
+
 ### Localization
 
 The counterpart package comes with support for localizing JavaScript Date objects. The `localize` function expects a date and options as arguments. The following example demonstrates the possible options.
