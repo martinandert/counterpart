@@ -204,7 +204,17 @@ describe('translate', function() {
             assert.equal(translate('bazz', { locale: 'en', scope: 'bar', fallback: { zero: 'no items', one: 'one item', other: '%(count)s items' }, count: 2 }), '2 items');
 
             assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: { oh: 'yeah' } }), { oh: 'yeah' });
-            assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: [1, 'A', 0.42] }), [1, 'A', 0.42]);
+            assert.deepEqual(translate('baz', { locale: 'foo', scope: 'bar', fallback: [1, 'A', 0.42] }), 1);
+          });
+
+          it('translates the fallback if given as "symbol" or array', function() {
+            translate.registerTranslations('en', { foo: { bar: 'bar', baz: 'baz' } });
+
+            assert.equal(translate('missing', { fallback: 'default' }), 'default');
+            assert.equal(translate('missing', { fallback: ':foo.bar' }), 'bar');
+            assert.equal(translate('missing', { fallback: ':bar', scope: 'foo' }), 'bar');
+            assert.equal(translate('missing', { fallback: [':also_missing', ':foo.bar'] }), 'bar');
+            assert.matches(translate('missing', { fallback: [':also_missing', ':foo.missed'] }), /missing translation/);
           });
         });
       });

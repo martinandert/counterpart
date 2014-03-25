@@ -6,6 +6,7 @@ var isArray = require('util').isArray;
 var isDate  = require('util').isDate;
 var sprintf = require('sprintf').sprintf;
 var events  = require('events');
+var except  = require('except');
 
 var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
@@ -54,9 +55,57 @@ function removeLocaleChangeListener(callback) {
   emitter.removeListener('localechange', callback);
 }
 
+function isString(val) {
+  return typeof val === 'string' || Object.prototype.toString.call(val) === '[object String]';
+}
+
+function isSymbol(key) {
+  return isString(key) && key[0] === ':';
+}
+
+function resolve(locale, scope, object, subject, options) {
+  options = options || {};
+
+  if (options.resolve === false) {
+    return subject;
+  }
+
+  var result;
+
+  if (isSymbol(subject)) {
+    result = translate(subject, extend({}, options, { locale: locale, scope: scope }));
+  } else {
+    result = subject;
+  }
+
+  return /^missing translation:/.test(result) ? null : result;
+}
+
+function fallback(locale, scope, object, subject, options) {
+  options = except(options, 'fallback');
+
+  if (isArray(subject)) {
+    for (var i = 0, ii = subject.length; i < ii; i++) {
+      var result = resolve(locale, scope, object, subject[i], options);
+
+      if (result) {
+        return result;
+      }
+    }
+
+    return null;
+  } else {
+    return resolve(locale, scope, object, subject, options);
+  }
+}
+
 function translate(key, options) {
-  if (!isArray(key) && typeof key !== 'string' || !key.length) {
+  if (!isArray(key) && !isString(key) || !key.length) {
     throw new Error('invalid argument: key');
+  }
+
+  if (isSymbol(key)) {
+    key = key.substr(1);
   }
 
   options = extend(true, {}, options);
@@ -77,12 +126,12 @@ function translate(key, options) {
     }
   }, registry.translations);
 
+  if (entry === null && options.fallback) {
+    entry = fallback(locale, scope, key, options.fallback, options);
+  }
+
   if (entry === null) {
-    if (options.fallback) {
-      entry = options.fallback;
-    } else {
-      entry = 'missing translation: ' + keys.join('.');
-    }
+    entry = 'missing translation: ' + keys.join('.');
   }
 
   entry = pluralize(locale, entry, options.count);
