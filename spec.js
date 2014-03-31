@@ -147,6 +147,12 @@ describe('translate', function() {
             it('interpolates the registered interpolations into the translated value', function() {
               var current = translate.__registry.interpolations;
 
+              translate.registerTranslations('en', {'hello':'Hello from %(brand)s!'});
+              translate.registerInterpolations({brand:'Z'});
+              assert.equal(translate('hello'), 'Hello from Z!');
+
+              translate.__registry.interpolations = current;
+
               translate.registerInterpolations({ app_name: 'My Cool App', question: 'How are you today?' });
               translate.registerTranslations('en', { greeting: 'Welcome to %(app_name)s, %(name)s! %(question)s' });
 

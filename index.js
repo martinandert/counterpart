@@ -155,7 +155,7 @@ function localize(object, options) {
   var type    = options.type    || 'datetime';
   var format  = options.format  || 'default';
 
-  options = { locale: locale, scope: scope };
+  options = { locale: locale, scope: scope, interpolate: false };
   format  = translate(['formats', type, format], extend(true, {}, options));
 
   return strftime(object, format, translate('names', options));
@@ -212,11 +212,11 @@ function pluralize(locale, entry, count) {
 }
 
 function interpolate(entry, values) {
-  if (typeof entry !== 'string' || !Object.keys(values).length) {
+  if (typeof entry !== 'string') {
     return entry;
   }
 
-  return sprintf(entry, extend(registry.interpolations, values));
+  return sprintf(entry, extend({}, registry.interpolations, values));
 }
 
 function withLocale(locale, callback, context) {
