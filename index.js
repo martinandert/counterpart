@@ -59,6 +59,10 @@ function isString(val) {
   return typeof val === 'string' || Object.prototype.toString.call(val) === '[object String]';
 }
 
+function isFunction(val) {
+  return typeof val === 'function' || Object.prototype.toString.call(val) === '[object Function]';
+}
+
 function isSymbol(key) {
   return isString(key) && key[0] === ':';
 }
@@ -74,6 +78,17 @@ function resolve(locale, scope, object, subject, options) {
 
   if (isSymbol(subject)) {
     result = translate(subject, extend({}, options, { locale: locale, scope: scope }));
+  } else if (isFunction(subject)) {
+    var dateOrTime;
+
+    if (options.object) {
+      dateOrTime = options.object;
+      delete options.object;
+    } else {
+      dateOrTime = object;
+    }
+
+    result = resolve(locale, scope, object, subject(dateOrTime, options));
   } else {
     result = subject;
   }

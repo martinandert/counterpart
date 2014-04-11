@@ -195,6 +195,19 @@ describe('translate', function() {
         });
       });
 
+      describe('with a function-type fallback present', function() {
+        it('returns the array that key points to', function() {
+          var myFunc = function() { return 'Here I am!'; };
+          var myFunc2 = function(x) { return 'Here ' + x + ' are!'; };
+          var fallbacks = [':i_dont_exist_either', myFunc, 'Should not be returned'];
+
+          assert.equal(translate('i_dont_exist', { fallback: myFunc }), 'Here I am!');
+          assert.equal(translate('i_dont_exist', { fallback: myFunc2, object: 'you' }), 'Here you are!');
+          assert.equal(translate('i_dont_exist', { fallback: myFunc2 }), 'Here i_dont_exist are!');
+          assert.equal(translate('i_dont_exist', { fallback: fallbacks }), 'Here I am!');
+        });
+      });
+
       describe('without a translation for the key present', function() {
         it('returns a string "missing translation: %(locale).%(scope).%(key)"', function() {
           assert.deepEqual(translate('bar', { locale: 'unknown', scope: 'foo' }), 'missing translation: unknown.foo.bar');
