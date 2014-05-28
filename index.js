@@ -12,6 +12,7 @@ var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
 
 var translationScope = 'counterpart';
+var translationSplitKeyChar = '.';
 
 var registry = global.__counterpart = global.__counterpart || {
   locale: 'en',
@@ -131,6 +132,9 @@ function translate(key, options) {
   var scope = options.scope || registry.scope;
   delete options.scope;
 
+  translationSplitKeyChar = options.splitKeyChar || '.';
+  delete options.splitKeyChar;
+
   var keys = normalizeKeys(locale, scope, key);
 
   var entry = keys.reduce(function(result, key) {
@@ -197,7 +201,7 @@ function normalizeKey(key) {
         return [];
       }
 
-      var keys = key.split('.');
+      var keys = key.split(translationSplitKeyChar);
 
       for (var i = keys.length - 1; i >= 0; i--) {
         if (keys[i] === '') {

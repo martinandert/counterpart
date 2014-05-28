@@ -33,8 +33,8 @@ This function expects a `key` and `options` as arguments and translates, plurali
 Translation data is organized as a nested object using the top-level key as namespace. *E.g.*, the [damals package](https://github.com/martinandert/damals) ships with the translation:
 
 ```js
-{ 
-  damals: { 
+{
+  damals: {
     about_x_hours_ago: {
       one:   'about one hour ago',
       other: 'about %(count)s hours ago'
@@ -65,6 +65,20 @@ translate('damals.about_x_hours_ago.one')
 translate('about_x_hours_ago.one', { scope: 'damals' })
 translate('one', { scope: 'damals.about_x_hours_ago' })
 translate('one', { scope: ['damals', 'about_x_hours_ago'] })
+```
+
+The `splitKeyChar` option allows you to change what the key gets split via for nested objects. It also allows you to stop counterpart splitting keys if you have a flat object structure:
+
+```js
+translate('damals.about_x_hours_ago.one', {splitKeyChar: '*'})  // => 'missing translation: en.damals.about_x_hours_ago.one'
+```
+
+Since we changed what our key should be split by counterpart will be looking for the following object structure:
+
+```js
+{
+  'damals.about_x_hours_ago.one': 'about one hour ago'
+}
 ```
 
 ### Interpolation
@@ -105,7 +119,7 @@ As seen above, the `count` option can be used both for pluralization and interpo
 
 ### Fallbacks
 
-If for a key no translation could be found, `translate` returns an error string of the form "translation missing: %(key)s". 
+If for a key no translation could be found, `translate` returns an error string of the form "translation missing: %(key)s".
 
 To mitigate this, provide the `fallback` option with an alternate text. The following example returns the translation for "baz" or "default" if no translation was found:
 
@@ -171,7 +185,7 @@ The data object to merge should contain a namespace (e.g. the name of your app/l
     "x_items": {
       "one":   "1 Stück",
       "other": "%(count)s Stücke"
-    } 
+    }
   }
 }
 ```
@@ -182,7 +196,7 @@ The translations are instantly made available:
 translate('greeting', { scope: 'my_project', name: 'Martin' })  // => 'Hallo, Martin!'
 ```
 
-Note that library authors should preload their translations only for the default ("en") locale, since tools like [webpack](http://webpack.github.io/) or [browserify](http://browserify.org/) will recursively bundle up all the required modules of a library into a single file. This will include even unneeded translations and so unnecessarily bloat the bundle. 
+Note that library authors should preload their translations only for the default ("en") locale, since tools like [webpack](http://webpack.github.io/) or [browserify](http://browserify.org/) will recursively bundle up all the required modules of a library into a single file. This will include even unneeded translations and so unnecessarily bloat the bundle.
 
 Instead, you as a library author should advise end-users to on-demand-load translations for other locales provided by your package:
 
@@ -196,8 +210,8 @@ require('counterpart').registerTranslations('de', require('my_package/locales/de
 Since v0.11, Counterpart allows you to register default interpolations using the `registerInterpolations` function. Here is an example:
 
 ```js
-translate.registerTranslations('en', { 
-  my_namespace: { 
+translate.registerTranslations('en', {
+  my_namespace: {
     greeting: 'Welcome to %(app_name)s, %(visitor)s!'
   }
 });
