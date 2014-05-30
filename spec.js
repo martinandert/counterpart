@@ -134,23 +134,30 @@ describe('translate', function() {
           });
         });
 
-        describe('with a `splitKeyChar`provided as option', function() {
+        describe('with a `separator` provided as option', function() {
           it('correctly returns single array with key', function() {
             translate.registerTranslations('en', {
               'long.key.with.dots.in.name': 'Key with dots doesn\'t get split and returns correctly',
               another: {
                 key: 'bar'
+              },
+              mixed: {
+                'dots.and': {
+                  separator: 'bingo'
+                }
               }
             });
 
-            assert.equal(translate('long.key.with.dots.in.name', { splitKeyChar: '-' }), 'Key with dots doesn\'t get split and returns correctly');
-            assert.equal(translate('another-key', { splitKeyChar: '-' }), 'bar');
+            assert.equal(translate('long.key.with.dots.in.name', { separator: '-' }), 'Key with dots doesn\'t get split and returns correctly');
+            assert.equal(translate('long.key.with.dots.in.name.not-found', { separator: '-' }), 'missing translation: en-long.key.with.dots.in.name.not-found');
+            assert.equal(translate('another-key', { separator: '-' }), 'bar');
+            assert.equal(translate('mixed-dots.and-separator', { separator: '-' }), 'bingo');
           });
 
           it('correctly returns nested key when using `*` as seperator', function() {
             translate.registerTranslations('en', { "long": { key: { "with": { dots: { "in": { name: 'boo'  }  } } }}  });
 
-            assert.equal(translate('long*key*with*dots*in*name', { splitKeyChar: '*' }), 'boo');
+            assert.equal(translate('long*key*with*dots*in*name', { separator: '*' }), 'boo');
           });
         });
 
@@ -465,6 +472,69 @@ describe('translate', function() {
         assert.equal(count, 2, 'handler was called although deactivated');
         done();
       }, 100);
+    });
+  });
+
+  describe('#getSeparator', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.getSeparator);
+    });
+
+    it('returns the separator stored in the registry', function() {
+      assert.equal(translate.getSeparator(), translate.__registry.separator);
+    });
+
+    it('returns "." by default', function() {
+      assert.equal(translate.getSeparator(), '.');
+    });
+  });
+
+  describe('#setSeparator', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.setSeparator);
+    });
+
+    it('sets the separator stored in the registry', function() {
+      var prev = translate.__registry.separator;
+
+      translate.setSeparator('*');
+      assert.equal(translate.__registry.separator, '*');
+
+      translate.__registry.separator = prev;
+    });
+
+    it('returns the previous separator that was stored in the registry', function() {
+      var current  = translate.getSeparator();
+      var previous = translate.setSeparator(current + 'x');
+      assert.equal(previous, current);
+      translate.setSeparator(current);
+    });
+  });
+
+  describe('#withSeparator', function() {
+    it('is a function', function() {
+      assert.isFunction(translate.withSeparator);
+    });
+
+    it('temporarily changes the current separator within the callback', function() {
+      var separator = translate.getSeparator();
+
+      translate.withSeparator(separator + 'x', function() {
+        assert.equal(translate.getSeparator(), separator + 'x');
+      });
+
+      assert.equal(translate.getSeparator(), separator);
+    });
+
+    it('allows a custom callback context to be set', function() {
+      translate.withSeparator('foo', function() {
+        assert.equal(this.bar, 'baz');
+      }, { bar: 'baz' })
+    });
+
+    it('returns the return value of the callback', function() {
+      var result = translate.withSeparator('foo', function() { return 'bar'; });
+      assert.equal(result, 'bar');
     });
   });
 
@@ -856,6 +926,8 @@ describe('translate', function() {
       assert.equal(translate('about_x_hours_ago.one', { scope: 'damals' }),      'about one hour ago');
       assert.equal(translate('one', { scope: 'damals.about_x_hours_ago' }),      'about one hour ago');
       assert.equal(translate('one', { scope: ['damals', 'about_x_hours_ago'] }), 'about one hour ago');
+
+      assert.equal(translate('damals.about_x_hours_ago.one', { separator: '*' }), 'missing translation: en*damals.about_x_hours_ago.one');
 
       translate.registerTranslations('en', { foo: 'foo %(bar)s' });
 

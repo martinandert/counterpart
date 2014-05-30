@@ -12,14 +12,14 @@ var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
 
 var translationScope = 'counterpart';
-var translationSplitKeyChar = '.';
 
 var registry = global.__counterpart = global.__counterpart || {
   locale: 'en',
   scope: null,
   translations: {},
   interpolations: {},
-  normalizedKeys: {}
+  normalizedKeys: {},
+  separator: '.'
 };
 
 function getLocale() {
@@ -34,6 +34,16 @@ function setLocale(value) {
     emitter.emit('localechange', value, previous);
   }
 
+  return previous;
+}
+
+function getSeparator() {
+  return registry.separator;
+}
+
+function setSeparator(value) {
+  var previous = registry.separator;
+  registry.separator = value;
   return previous;
 }
 
@@ -132,10 +142,10 @@ function translate(key, options) {
   var scope = options.scope || registry.scope;
   delete options.scope;
 
-  translationSplitKeyChar = options.splitKeyChar || '.';
-  delete options.splitKeyChar;
+  var separator = options.separator || registry.separator;
+  delete options.separator;
 
-  var keys = normalizeKeys(locale, scope, key);
+  var keys = normalizeKeys(locale, scope, key, separator);
 
   var entry = keys.reduce(function(result, key) {
     if (Object.prototype.toString.call(result) === '[object Object]' && Object.prototype.hasOwnProperty.call(result, key)) {
@@ -150,7 +160,7 @@ function translate(key, options) {
   }
 
   if (entry === null) {
-    entry = 'missing translation: ' + keys.join('.');
+    entry = 'missing translation: ' + keys.join(separator);
   }
 
   entry = pluralize(locale, entry, options.count);
@@ -180,20 +190,22 @@ function localize(object, options) {
   return strftime(object, format, translate('names', options));
 }
 
-function normalizeKeys(locale, scope, key) {
+function normalizeKeys(locale, scope, key, separator) {
   var keys = [];
 
-  keys = keys.concat(normalizeKey(locale));
-  keys = keys.concat(normalizeKey(scope));
-  keys = keys.concat(normalizeKey(key));
+  keys = keys.concat(normalizeKey(locale, separator));
+  keys = keys.concat(normalizeKey(scope, separator));
+  keys = keys.concat(normalizeKey(key, separator));
 
   return keys;
 }
 
-function normalizeKey(key) {
-  registry.normalizedKeys[key] = registry.normalizedKeys[key] || (function(key) {
+function normalizeKey(key, separator) {
+  registry.normalizedKeys[separator] = registry.normalizedKeys[separator] || {};
+
+  registry.normalizedKeys[separator][key] = registry.normalizedKeys[separator][key] || (function(key) {
     if (isArray(key)) {
-      var normalizedKeyArray = key.map(function(k) { return normalizeKey(k); });
+      var normalizedKeyArray = key.map(function(k) { return normalizeKey(k, separator); });
 
       return [].concat.apply([], normalizedKeyArray);
     } else {
@@ -201,7 +213,7 @@ function normalizeKey(key) {
         return [];
       }
 
-      var keys = key.split(translationSplitKeyChar);
+      var keys = key.split(separator);
 
       for (var i = keys.length - 1; i >= 0; i--) {
         if (keys[i] === '') {
@@ -213,7 +225,7 @@ function normalizeKey(key) {
     }
   })(key);
 
-  return registry.normalizedKeys[key];
+  return registry.normalizedKeys[separator][key];
 }
 
 function pluralize(locale, entry, count) {
@@ -254,6 +266,13 @@ function withScope(scope, callback, context) {
   return result;
 }
 
+function withSeparator(separator, callback, context) {
+  var previous = setSeparator(separator);
+  var result = callback.call(context);
+  setSeparator(previous);
+  return result;
+}
+
 registerTranslations('en', require('./locales/en'));
 
 module.exports = translate;
@@ -261,9 +280,12 @@ module.exports = translate;
 module.exports.translate              = translate;
 module.exports.setLocale              = setLocale;
 module.exports.getLocale              = getLocale;
+module.exports.setSeparator           = setSeparator;
+module.exports.getSeparator           = getSeparator;
 module.exports.localize               = localize;
 module.exports.withLocale             = withLocale;
 module.exports.withScope              = withScope;
+module.exports.withSeparator          = withSeparator;
 module.exports.registerTranslations   = registerTranslations;
 module.exports.registerInterpolations = registerInterpolations;
 module.exports.onLocaleChange         = addLocaleChangeListener;

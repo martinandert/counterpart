@@ -67,10 +67,11 @@ translate('one', { scope: 'damals.about_x_hours_ago' })
 translate('one', { scope: ['damals', 'about_x_hours_ago'] })
 ```
 
-The `splitKeyChar` option allows you to change what the key gets split via for nested objects. It also allows you to stop counterpart splitting keys if you have a flat object structure:
+The `separator` option allows you to change what the key gets split via for nested objects. It also allows you to stop counterpart splitting keys if you have a flat object structure:
 
 ```js
-translate('damals.about_x_hours_ago.one', {splitKeyChar: '*'})  // => 'missing translation: en.damals.about_x_hours_ago.one'
+translate('damals.about_x_hours_ago.one', { separator: '*' })
+// => 'missing translation: en*damals.about_x_hours_ago.one'
 ```
 
 Since we changed what our key should be split by counterpart will be looking for the following object structure:
@@ -80,6 +81,14 @@ Since we changed what our key should be split by counterpart will be looking for
   'damals.about_x_hours_ago.one': 'about one hour ago'
 }
 ```
+
+The `setSeparator` function allows you to globally change the default separator used to split translation keys:
+
+```js
+translate.setSeparator('*') // => '.' (returns the previous separator)
+```
+
+There is also a `getSeparator` function which returns the currently set default separator.
 
 ### Interpolation
 
@@ -165,7 +174,7 @@ Another way to temporarily change the current locale is by using the `locale` op
 translate('foo', { locale: 'de' });
 ```
 
-There is also a `withScope` function that works exactly the same as `withLocale`.
+There are also `withScope` and `withSeparator` functions that behave exactly the same as `withLocale`.
 
 ### Adding Translation Data
 
