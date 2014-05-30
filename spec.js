@@ -134,6 +134,26 @@ describe('translate', function() {
           });
         });
 
+        describe('with a `splitKeyChar`provided as option', function() {
+          it('correctly returns single array with key', function() {
+            translate.registerTranslations('en', {
+              'long.key.with.dots.in.name': 'Key with dots doesn\'t get split and returns correctly',
+              another: {
+                key: 'bar'
+              }
+            });
+
+            assert.equal(translate('long.key.with.dots.in.name', { splitKeyChar: '-' }), 'Key with dots doesn\'t get split and returns correctly');
+            assert.equal(translate('another-key', { splitKeyChar: '-' }), 'bar');
+          });
+
+          it('correctly returns nested key when using `*` as seperator', function() {
+            translate.registerTranslations('en', { "long": { key: { "with": { dots: { "in": { name: 'boo'  }  } } }}  });
+
+            assert.equal(translate('long*key*with*dots*in*name', { splitKeyChar: '*' }), 'boo');
+          });
+        });
+
         describe('with other options provided', function() {
           describe('by default', function() {
             it('interpolates these options into the translated value', function() {
