@@ -450,6 +450,34 @@ describe('translate', function() {
         translate.offLocaleChange(handler);
       });
     });
+
+    describe('when called more than 10 times', function() {
+      it('does not let Node issue a warning about a possible memory leak', function() {
+        var oldConsoleError = console.error;
+
+        console.error = function(message) {
+          if (/EventEmitter memory leak/.test(message)) {
+            assert.fail(null, null, 'Node issues a warning about a possible memory leak', null);
+          } else {
+            oldConsoleError.apply(console, arguments);
+          }
+        };
+
+        var handlers = [], handler, i;
+
+        for (i = 0; i < 11; i++) {
+          handler = function() {};
+          translate.onLocaleChange(handler);
+          handlers.push(handler);
+        }
+
+        for (i = 0; i < 11; i++) {
+          translate.offLocaleChange(handlers[i]);
+        }
+
+        console.error = oldConsoleError
+      });
+    })
   });
 
   describe('#offLocaleChange', function() {

@@ -10,6 +10,7 @@ var except  = require('except');
 
 var strftime = require('./strftime');
 var emitter  = new events.EventEmitter();
+emitter.setMaxListeners(0);
 
 var translationScope = 'counterpart';
 
