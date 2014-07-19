@@ -1,6 +1,5 @@
 'use strict';
 
-var global  = require('global');
 var extend  = require('extend');
 var isArray = require('util').isArray;
 var isDate  = require('util').isDate;
@@ -9,63 +8,8 @@ var events  = require('events');
 var except  = require('except');
 
 var strftime = require('./strftime');
-var emitter  = new events.EventEmitter();
-emitter.setMaxListeners(0);
 
 var translationScope = 'counterpart';
-
-var registry = global.__counterpart = global.__counterpart || {
-  locale: 'en',
-  scope: null,
-  translations: {},
-  interpolations: {},
-  normalizedKeys: {},
-  separator: '.'
-};
-
-function getLocale() {
-  return registry.locale;
-}
-
-function setLocale(value) {
-  var previous = registry.locale;
-
-  if (previous != value) {
-    registry.locale = value;
-    emitter.emit('localechange', value, previous);
-  }
-
-  return previous;
-}
-
-function getSeparator() {
-  return registry.separator;
-}
-
-function setSeparator(value) {
-  var previous = registry.separator;
-  registry.separator = value;
-  return previous;
-}
-
-function registerTranslations(locale, data) {
-  var translations = {};
-  translations[locale] = data;
-  extend(true, registry.translations, translations);
-  return translations;
-}
-
-function registerInterpolations(data) {
-  return extend(true, registry.interpolations, data);
-}
-
-function addLocaleChangeListener(callback) {
-  emitter.addListener('localechange', callback);
-}
-
-function removeLocaleChangeListener(callback) {
-  emitter.removeListener('localechange', callback);
-}
 
 function isString(val) {
   return typeof val === 'string' || Object.prototype.toString.call(val) === '[object String]';
@@ -79,54 +23,69 @@ function isSymbol(key) {
   return isString(key) && key[0] === ':';
 }
 
-function resolve(locale, scope, object, subject, options) {
-  options = options || {};
+function Counterpart() {
+  this._registry = {
+    locale: 'en',
+    scope: null,
+    translations: {},
+    interpolations: {},
+    normalizedKeys: {},
+    separator: '.'
+  };
 
-  if (options.resolve === false) {
-    return subject;
-  }
-
-  var result;
-
-  if (isSymbol(subject)) {
-    result = translate(subject, extend({}, options, { locale: locale, scope: scope }));
-  } else if (isFunction(subject)) {
-    var dateOrTime;
-
-    if (options.object) {
-      dateOrTime = options.object;
-      delete options.object;
-    } else {
-      dateOrTime = object;
-    }
-
-    result = resolve(locale, scope, object, subject(dateOrTime, options));
-  } else {
-    result = subject;
-  }
-
-  return /^missing translation:/.test(result) ? null : result;
+  this.registerTranslations('en', require('./locales/en'));
+  this.setMaxListeners(0);
 }
 
-function fallback(locale, scope, object, subject, options) {
-  options = except(options, 'fallback');
+extend(Counterpart.prototype, events.EventEmitter.prototype);
 
-  if (isArray(subject)) {
-    for (var i = 0, ii = subject.length; i < ii; i++) {
-      var result = resolve(locale, scope, object, subject[i], options);
+Counterpart.prototype.getLocale = function() {
+  return this._registry.locale;
+};
 
-      if (result) {
-        return result;
-      }
-    }
+Counterpart.prototype.setLocale = function(value) {
+  var previous = this._registry.locale;
 
-    return null;
-  } else {
-    return resolve(locale, scope, object, subject, options);
+  if (previous != value) {
+    this._registry.locale = value;
+    this.emit('localechange', value, previous);
   }
-}
 
-function translate(key, options) {
+  return previous;
+};
+
+Counterpart.prototype.getSeparator = function() {
+  return this._registry.separator;
+};
+
+Counterpart.prototype.setSeparator = function(value) {
+  var previous = this._registry.separator;
+  this._registry.separator = value;
+  return previous;
+};
+
+Counterpart.prototype.registerTranslations = function(locale, data) {
+  var translations = {};
+  translations[locale] = data;
+  extend(true, this._registry.translations, translations);
+  return translations;
+};
+
+Counterpart.prototype.registerInterpolations = function(data) {
+  return extend(true, this._registry.interpolations, data);
+};
+
+Counterpart.prototype.onLocaleChange =
+Counterpart.prototype.addLocaleChangeListener = function(callback) {
+  this.addListener('localechange', callback);
+};
+
+Counterpart.prototype.offLocaleChange =
+Counterpart.prototype.removeLocaleChangeListener = function(callback) {
+  this.removeListener('localechange', callback);
+};
+
+Counterpart.prototype.translate = function(key, options) {
   if (!isArray(key) && !isString(key) || !key.length) {
     throw new Error('invalid argument: key');
   }
@@ -137,16 +96,16 @@ function translate(key, options) {
 
   options = extend(true, {}, options);
 
-  var locale = options.locale || registry.locale;
+  var locale = options.locale || this._registry.locale;
   delete options.locale;
 
-  var scope = options.scope || registry.scope;
+  var scope = options.scope || this._registry.scope;
   delete options.scope;
 
-  var separator = options.separator || registry.separator;
+  var separator = options.separator || this._registry.separator;
   delete options.separator;
 
-  var keys = normalizeKeys(locale, scope, key, separator);
+  var keys = this._normalizeKeys(locale, scope, key, separator);
 
   var entry = keys.reduce(function(result, key) {
     if (Object.prototype.toString.call(result) === '[object Object]' && Object.prototype.hasOwnProperty.call(result, key)) {
@@ -154,59 +113,96 @@ function translate(key, options) {
     } else {
       return null;
     }
-  }, registry.translations);
+  }, this._registry.translations);
 
   if (entry === null && options.fallback) {
-    entry = fallback(locale, scope, key, options.fallback, options);
+    entry = this._fallback(locale, scope, key, options.fallback, options);
   }
 
   if (entry === null) {
     entry = 'missing translation: ' + keys.join(separator);
   }
 
-  entry = pluralize(locale, entry, options.count);
+  entry = this._pluralize(locale, entry, options.count);
 
   if (options.interpolate !== false) {
-    entry = interpolate(entry, options);
+    entry = this._interpolate(entry, options);
   }
 
   return entry;
-}
+};
 
-function localize(object, options) {
+Counterpart.prototype.localize = function(object, options) {
   if (!isDate(object)) {
     throw new Error('invalid argument: object must be a date');
   }
 
   options = extend(true, {}, options);
 
-  var locale  = options.locale  || registry.locale;
+  var locale  = options.locale  || this._registry.locale;
   var scope   = options.scope   || translationScope;
   var type    = options.type    || 'datetime';
   var format  = options.format  || 'default';
 
   options = { locale: locale, scope: scope, interpolate: false };
-  format  = translate(['formats', type, format], extend(true, {}, options));
+  format  = this.translate(['formats', type, format], extend(true, {}, options));
 
-  return strftime(object, format, translate('names', options));
-}
+  return strftime(object, format, this.translate('names', options));
+};
 
-function normalizeKeys(locale, scope, key, separator) {
+Counterpart.prototype._pluralize = function(locale, entry, count) {
+  if (typeof entry !== 'object' || entry === null || typeof count !== 'number') {
+    return entry;
+  }
+
+  var pluralizeFunc = this.translate('pluralize', { locale: locale, scope: translationScope });
+
+  if (Object.prototype.toString.call(pluralizeFunc) !== '[object Function]') {
+    return pluralizeFunc;
+  }
+
+  return pluralizeFunc(entry, count);
+};
+
+Counterpart.prototype.withLocale = function(locale, callback, context) {
+  var previous = this._registry.locale;
+  this._registry.locale = locale;
+  var result = callback.call(context);
+  this._registry.locale = previous;
+  return result;
+};
+
+Counterpart.prototype.withScope = function(scope, callback, context) {
+  var previous = this._registry.scope;
+  this._registry.scope = scope;
+  var result = callback.call(context);
+  this._registry.scope = previous;
+  return result;
+};
+
+Counterpart.prototype.withSeparator = function(separator, callback, context) {
+  var previous = this.setSeparator(separator);
+  var result = callback.call(context);
+  this.setSeparator(previous);
+  return result;
+};
+
+Counterpart.prototype._normalizeKeys = function(locale, scope, key, separator) {
   var keys = [];
 
-  keys = keys.concat(normalizeKey(locale, separator));
-  keys = keys.concat(normalizeKey(scope, separator));
-  keys = keys.concat(normalizeKey(key, separator));
+  keys = keys.concat(this._normalizeKey(locale, separator));
+  keys = keys.concat(this._normalizeKey(scope, separator));
+  keys = keys.concat(this._normalizeKey(key, separator));
 
   return keys;
-}
+};
 
-function normalizeKey(key, separator) {
-  registry.normalizedKeys[separator] = registry.normalizedKeys[separator] || {};
+Counterpart.prototype._normalizeKey = function(key, separator) {
+  this._registry.normalizedKeys[separator] = this._registry.normalizedKeys[separator] || {};
 
-  registry.normalizedKeys[separator][key] = registry.normalizedKeys[separator][key] || (function(key) {
+  this._registry.normalizedKeys[separator][key] = this._registry.normalizedKeys[separator][key] || (function(key) {
     if (isArray(key)) {
-      var normalizedKeyArray = key.map(function(k) { return normalizeKey(k, separator); });
+      var normalizedKeyArray = key.map(function(k) { return this._normalizeKey(k, separator); }.bind(this));
 
       return [].concat.apply([], normalizedKeyArray);
     } else {
@@ -224,74 +220,74 @@ function normalizeKey(key, separator) {
 
       return keys;
     }
-  })(key);
+  }.bind(this))(key);
 
-  return registry.normalizedKeys[separator][key];
-}
+  return this._registry.normalizedKeys[separator][key];
+};
 
-function pluralize(locale, entry, count) {
-  if (typeof entry !== 'object' || entry === null || typeof count !== 'number') {
-    return entry;
-  }
-
-  var pluralizeFunc = translate('pluralize', { locale: locale, scope: translationScope });
-
-  if (Object.prototype.toString.call(pluralizeFunc) !== '[object Function]') {
-    return pluralizeFunc;
-  }
-
-  return pluralizeFunc(entry, count);
-}
-
-function interpolate(entry, values) {
+Counterpart.prototype._interpolate = function(entry, values) {
   if (typeof entry !== 'string') {
     return entry;
   }
 
-  return sprintf(entry, extend({}, registry.interpolations, values));
+  return sprintf(entry, extend({}, this._registry.interpolations, values));
+};
+
+Counterpart.prototype._resolve = function(locale, scope, object, subject, options) {
+  options = options || {};
+
+  if (options.resolve === false) {
+    return subject;
+  }
+
+  var result;
+
+  if (isSymbol(subject)) {
+    result = this.translate(subject, extend({}, options, { locale: locale, scope: scope }));
+  } else if (isFunction(subject)) {
+    var dateOrTime;
+
+    if (options.object) {
+      dateOrTime = options.object;
+      delete options.object;
+    } else {
+      dateOrTime = object;
+    }
+
+    result = this._resolve(locale, scope, object, subject(dateOrTime, options));
+  } else {
+    result = subject;
+  }
+
+  return /^missing translation:/.test(result) ? null : result;
+};
+
+Counterpart.prototype._fallback = function(locale, scope, object, subject, options) {
+  options = except(options, 'fallback');
+
+  if (isArray(subject)) {
+    for (var i = 0, ii = subject.length; i < ii; i++) {
+      var result = this._resolve(locale, scope, object, subject[i], options);
+
+      if (result) {
+        return result;
+      }
+    }
+
+    return null;
+  } else {
+    return this._resolve(locale, scope, object, subject, options);
+  }
+};
+
+var instance = new Counterpart();
+
+function translate() {
+  return instance.translate.apply(instance, arguments);
 }
 
-function withLocale(locale, callback, context) {
-  var previous = registry.locale;
-  registry.locale = locale;
-  var result = callback.call(context);
-  registry.locale = previous;
-  return result;
-}
-
-function withScope(scope, callback, context) {
-  var previous = registry.scope;
-  registry.scope = scope;
-  var result = callback.call(context);
-  registry.scope = previous;
-  return result;
-}
-
-function withSeparator(separator, callback, context) {
-  var previous = setSeparator(separator);
-  var result = callback.call(context);
-  setSeparator(previous);
-  return result;
-}
-
-registerTranslations('en', require('./locales/en'));
+extend(translate, instance, {
+  Instance: Counterpart
+});
 
 module.exports = translate;
-
-module.exports.translate              = translate;
-module.exports.setLocale              = setLocale;
-module.exports.getLocale              = getLocale;
-module.exports.setSeparator           = setSeparator;
-module.exports.getSeparator           = getSeparator;
-module.exports.localize               = localize;
-module.exports.withLocale             = withLocale;
-module.exports.withScope              = withScope;
-module.exports.withSeparator          = withSeparator;
-module.exports.registerTranslations   = registerTranslations;
-module.exports.registerInterpolations = registerInterpolations;
-module.exports.onLocaleChange         = addLocaleChangeListener;
-module.exports.offLocaleChange        = removeLocaleChangeListener;
-
-if (process.env.NODE_ENV !== 'production') {
-  module.exports.__registry = registry;
-}

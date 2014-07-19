@@ -261,6 +261,18 @@ translate.localize(date, { locale: 'de' })  // => 'Fr, 21. Feb 2014, 13:46 Uhr'
 
 Sure, you can integrate custom localizations by adding to or overwriting the "counterpart" namespace. See [locales/en.js](locales/en.js) and [locales/de.js](locales/de.js) for example localization files.
 
+### As an instance
+
+You can invoke an instance of Counterpart should you need various locales displayed at once in your application:
+
+```js
+var Counterpart = require('counterpart').Instance;
+
+var instance = new Counterpart();
+
+instance.registerTranslations('en', {foo: 'bar'});
+instance.translate('foo');
+```
 
 ## Contributing
 
