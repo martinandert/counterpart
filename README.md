@@ -270,7 +270,7 @@ var Counterpart = require('counterpart').Instance;
 
 var instance = new Counterpart();
 
-instance.registerTranslations('en', {foo: 'bar'});
+instance.registerTranslations('en', { foo: 'bar' });
 instance.translate('foo');
 ```
 

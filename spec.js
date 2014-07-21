@@ -728,8 +728,8 @@ describe('translate', function() {
       describe('with locale set to "de"', function() {
         var prev;
 
-        before(function() { instance.registerTranslations('de', require('./locales/de')); prev = instance.setLocale('de'); });
-        after(function() { instance.setLocale(prev); });
+        beforeEach(function() { instance.registerTranslations('de', require('./locales/de')); prev = instance.setLocale('de'); });
+        afterEach(function() { instance.setLocale(prev); });
 
         describe('without providing options as second argument', function() {
           it('returns the default localization for that date', function() {
