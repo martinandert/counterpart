@@ -1,6 +1,6 @@
 var assert      = require('assert');
-var Counterpart = require('./');
-var Instance = Counterpart.Instance;
+var translate   = require('./');
+var Instance    = translate.Instance;
 
 describe('translate', function() {
   var instance;
@@ -15,7 +15,6 @@ describe('translate', function() {
   });
 
   it('is backward-compatible', function() {
-    var translate = require('./');
     assert.equal(Object.prototype.toString.call(translate), '[object Function]');
     assert.equal(Object.prototype.toString.call(translate.translate), '[object Function]');
   });
@@ -728,8 +727,14 @@ describe('translate', function() {
       describe('with locale set to "de"', function() {
         var prev;
 
-        beforeEach(function() { instance.registerTranslations('de', require('./locales/de')); prev = instance.setLocale('de'); });
-        afterEach(function() { instance.setLocale(prev); });
+        beforeEach(function() {
+          instance.registerTranslations('de', require('./locales/de'));
+          prev = instance.setLocale('de');
+        });
+
+        afterEach(function() {
+          instance.setLocale(prev);
+        });
 
         describe('without providing options as second argument', function() {
           it('returns the default localization for that date', function() {
@@ -931,7 +936,7 @@ describe('translate', function() {
 
   describe('explicitly checking the examples of the README', function() {
     it('passes all tests', function() {
-      instance.registerTranslations('en', {
+      translate.registerTranslations('en', {
         damals: {
           about_x_hours_ago: {
             one:   'about one hour ago',
@@ -940,22 +945,22 @@ describe('translate', function() {
         }
       });
 
-      assert.deepEqual(instance.translate('damals'), { about_x_hours_ago: { one: 'about one hour ago', other: 'about %(count)s hours ago' } });
+      assert.deepEqual(translate('damals'), { about_x_hours_ago: { one: 'about one hour ago', other: 'about %(count)s hours ago' } });
 
-      assert.equal(instance.translate('damals.about_x_hours_ago.one'),                    'about one hour ago');
-      assert.equal(instance.translate(['damals', 'about_x_hours_ago', 'one']),            'about one hour ago');
-      assert.equal(instance.translate(['damals', 'about_x_hours_ago.one']),               'about one hour ago');
-      assert.equal(instance.translate('about_x_hours_ago.one', { scope: 'damals' }),      'about one hour ago');
-      assert.equal(instance.translate('one', { scope: 'damals.about_x_hours_ago' }),      'about one hour ago');
-      assert.equal(instance.translate('one', { scope: ['damals', 'about_x_hours_ago'] }), 'about one hour ago');
+      assert.equal(translate('damals.about_x_hours_ago.one'),                    'about one hour ago');
+      assert.equal(translate(['damals', 'about_x_hours_ago', 'one']),            'about one hour ago');
+      assert.equal(translate(['damals', 'about_x_hours_ago.one']),               'about one hour ago');
+      assert.equal(translate('about_x_hours_ago.one', { scope: 'damals' }),      'about one hour ago');
+      assert.equal(translate('one', { scope: 'damals.about_x_hours_ago' }),      'about one hour ago');
+      assert.equal(translate('one', { scope: ['damals', 'about_x_hours_ago'] }), 'about one hour ago');
 
-      assert.equal(instance.translate('damals.about_x_hours_ago.one', { separator: '*' }), 'missing translation: en*damals.about_x_hours_ago.one');
+      assert.equal(translate('damals.about_x_hours_ago.one', { separator: '*' }), 'missing translation: en*damals.about_x_hours_ago.one');
 
-      instance.registerTranslations('en', { foo: 'foo %(bar)s' });
+      translate.registerTranslations('en', { foo: 'foo %(bar)s' });
 
-      assert.equal(instance.translate('foo', { bar: 'baz' }), 'foo baz');
+      assert.equal(translate('foo', { bar: 'baz' }), 'foo baz');
 
-      instance.registerTranslations('en', {
+      translate.registerTranslations('en', {
         x_items: {
           zero:  'No items.',
           one:   'One item.',
@@ -963,44 +968,44 @@ describe('translate', function() {
         }
       });
 
-      assert.equal(instance.translate('x_items', { count: 0  }), 'No items.');
-      assert.equal(instance.translate('x_items', { count: 1  }), 'One item.');
-      assert.equal(instance.translate('x_items', { count: 42 }), '42 items.');
+      assert.equal(translate('x_items', { count: 0  }), 'No items.');
+      assert.equal(translate('x_items', { count: 1  }), 'One item.');
+      assert.equal(translate('x_items', { count: 42 }), '42 items.');
 
-      assert.equal(instance.translate('baz', { fallback: 'default' }), 'default');
+      assert.equal(translate('baz', { fallback: 'default' }), 'default');
 
-      instance.registerTranslations('de', require('./locales/de'));
-      instance.registerTranslations('de', JSON.parse('{"my_project": {"greeting": "Hallo, %(name)s!","x_items": {"one": "1 Stück", "other": "%(count)s Stücke"}}}'));
+      translate.registerTranslations('de', require('./locales/de'));
+      translate.registerTranslations('de', JSON.parse('{"my_project": {"greeting": "Hallo, %(name)s!","x_items": {"one": "1 Stück", "other": "%(count)s Stücke"}}}'));
 
-      assert.equal(instance.withLocale('de', function() { return instance.translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
-      assert.equal(instance.withLocale('de', function() { return instance.translate('x_items', { scope: 'my_project', count: 1 }); }), '1 Stück');
+      assert.equal(translate.withLocale('de', function() { return translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
+      assert.equal(translate.withLocale('de', function() { return translate('x_items', { scope: 'my_project', count: 1 }); }), '1 Stück');
 
       var date = new Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
 
-      assert.equal(instance.localize(date)                       , 'Fri, 21 Feb 2014 13:46');
-      assert.equal(instance.localize(date, { format: 'short' })  , '21 Feb 13:46');
-      assert.equal(instance.localize(date, { format: 'long' })   , 'Friday, February 21st, 2014 13:46:24 +01:00');
+      assert.equal(translate.localize(date)                       , 'Fri, 21 Feb 2014 13:46');
+      assert.equal(translate.localize(date, { format: 'short' })  , '21 Feb 13:46');
+      assert.equal(translate.localize(date, { format: 'long' })   , 'Friday, February 21st, 2014 13:46:24 +01:00');
 
-      assert.equal(instance.localize(date, { type: 'date' })                  , 'Fri, 21 Feb 2014');
-      assert.equal(instance.localize(date, { type: 'date', format: 'short' }) , 'Feb 21');
-      assert.equal(instance.localize(date, { type: 'date', format: 'long' })  , 'Friday, February 21st, 2014');
+      assert.equal(translate.localize(date, { type: 'date' })                  , 'Fri, 21 Feb 2014');
+      assert.equal(translate.localize(date, { type: 'date', format: 'short' }) , 'Feb 21');
+      assert.equal(translate.localize(date, { type: 'date', format: 'long' })  , 'Friday, February 21st, 2014');
 
-      assert.equal(instance.localize(date, { type: 'time' })                  , '13:46');
-      assert.equal(instance.localize(date, { type: 'time', format: 'short' }) , '13:46');
-      assert.equal(instance.localize(date, { type: 'time', format: 'long' })  , '13:46:24 +01:00');
+      assert.equal(translate.localize(date, { type: 'time' })                  , '13:46');
+      assert.equal(translate.localize(date, { type: 'time', format: 'short' }) , '13:46');
+      assert.equal(translate.localize(date, { type: 'time', format: 'long' })  , '13:46:24 +01:00');
 
-      assert.equal(instance.localize(date, { locale: 'de' })  , 'Fr, 21. Feb 2014, 13:46 Uhr');
+      assert.equal(translate.localize(date, { locale: 'de' })  , 'Fr, 21. Feb 2014, 13:46 Uhr');
 
-      instance.registerTranslations('en', {
+      translate.registerTranslations('en', {
         my_namespace: {
           greeting: 'Welcome to %(app_name)s, %(visitor)s!'
         }
       });
 
-      instance.registerInterpolations({ app_name: 'My Cool App' });
+      translate.registerInterpolations({ app_name: 'My Cool App' });
 
-      assert.equal(instance.translate('my_namespace.greeting', { visitor: 'Martin' }), 'Welcome to My Cool App, Martin!');
-      assert.equal(instance.translate('my_namespace.greeting', { visitor: 'Martin', app_name: 'The Foo App' }), 'Welcome to The Foo App, Martin!');
+      assert.equal(translate('my_namespace.greeting', { visitor: 'Martin' }), 'Welcome to My Cool App, Martin!');
+      assert.equal(translate('my_namespace.greeting', { visitor: 'Martin', app_name: 'The Foo App' }), 'Welcome to The Foo App, Martin!');
     });
   });
 });
@@ -1032,17 +1037,3 @@ assert.matches = function(actual, expected, message) {
     assert.fail(actual, expected, message, '!~');
   }
 };
-
-function exposesFunction(object, name) {
-  it('exposes a `' + name + '` function', function() {
-    assert.isFunction(object[name]);
-  });
-}
-
-function withNodeEnv(env, callback) {
-  var previous = process.env.NODE_ENV;
-  process.env.NODE_ENV = env;
-  var result = callback();
-  process.env.NODE_ENV = previous;
-  return result;
-}
