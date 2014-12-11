@@ -29,24 +29,19 @@
     }
   ],
   "license": "MIT",
-  "scripts": {
-    "test": "make test"
-  },
   "bugs": {
     "url": "https://github.com/martinandert/counterpart/issues"
   },
   "homepage": "https://github.com/martinandert/counterpart",
   "dependencies": {
-    "extend": "~1.2.1",
-    "sprintf": "~0.1.3",
-    "date-names": "~0.1.2",
-    "pluralizers": "~0.1.0",
-    "except": "^0.1.1"
+    "date-names": "^0.1.4",
+    "except": "^0.1.3",
+    "object-assign": "^2.0.0",
+    "pluralizers": "^0.1.1",
+    "sprintf": "^0.1.5"
   },
   "devDependencies": {
-    "semver": "~2.2.1",
-    "node-dev": "~2.1.6",
-    "mocha": "~1.17.1",
-    "jshint": "~2.4.3"
+    "jshint": "^2.5.10",
+    "mocha": "^2.0.1"
   }
 }

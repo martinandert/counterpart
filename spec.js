@@ -10,13 +10,12 @@ describe('translate', function() {
   });
 
   it('is a function', function() {
-    var type = Object.prototype.toString.call(instance.translate);
-    assert.equal(type, '[object Function]');
+    assert.isFunction(instance.translate);
   });
 
   it('is backward-compatible', function() {
-    assert.equal(Object.prototype.toString.call(translate), '[object Function]');
-    assert.equal(Object.prototype.toString.call(translate.translate), '[object Function]');
+    assert.isFunction(translate);
+    assert.isFunction(translate.translate);
   });
 
   describe('when called', function() {
