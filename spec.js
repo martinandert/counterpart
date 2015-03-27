@@ -1,6 +1,7 @@
-var assert      = require('assert');
-var translate   = require('./');
-var Instance    = translate.Instance;
+var assert    = require('assert');
+var time      = require('time');
+var translate = require('./');
+var Instance  = translate.Instance;
 
 describe('translate', function() {
   var instance;
@@ -582,12 +583,13 @@ describe('translate', function() {
     });
 
     describe('when called with a date as first argument', function() {
-      var date = new Date('Thu Feb 6 2014 07:09:04 GMT+0100 (CET)');
+      var date = new time.Date('Thu Feb 6 2014 05:09:04 GMT+0100 (CET)');
+      date.setTimezone('America/Chicago');
 
       describe('without providing options as second argument', function() {
         it('returns the default localization for that date', function() {
           var result = instance.localize(date);
-          assert.equal(result, 'Thu, 6 Feb 2014 07:09');
+          assert.equal(result, 'Wed, 5 Feb 2014 22:09');
         });
       });
 
@@ -595,21 +597,21 @@ describe('translate', function() {
         describe('with format = "default"', function() {
           it('returns the default localization for that date', function() {
             var result = instance.localize(date, { format: 'default' });
-            assert.equal(result, 'Thu, 6 Feb 2014 07:09');
+            assert.equal(result, 'Wed, 5 Feb 2014 22:09');
           });
         });
 
         describe('with format = "short"', function() {
           it('returns the short localization for that date', function() {
             var result = instance.localize(date, { format: 'short' });
-            assert.equal(result, '6 Feb 07:09');
+            assert.equal(result, '5 Feb 22:09');
           });
         });
 
         describe('with format = "long"', function() {
           it('returns the long localization for that date', function() {
             var result = instance.localize(date, { format: 'long' });
-            assert.equal(result, 'Thursday, February 6th, 2014 07:09:04 +01:00');
+            assert.equal(result, 'Wednesday, February 5th, 2014 22:09:04 -06:00');
           });
         });
 
@@ -625,21 +627,21 @@ describe('translate', function() {
         describe('with type = "datetime"', function() {
           it('returns the default localization for that date', function() {
             var result = instance.localize(date, { type: 'datetime' });
-            assert.equal(result, 'Thu, 6 Feb 2014 07:09');
+            assert.equal(result, 'Wed, 5 Feb 2014 22:09');
           });
         });
 
         describe('with type = "date"', function() {
           it('returns the date localization for that date', function() {
             var result = instance.localize(date, { type: 'date' });
-            assert.equal(result, 'Thu, 6 Feb 2014');
+            assert.equal(result, 'Wed, 5 Feb 2014');
           });
         });
 
         describe('with type = "time"', function() {
           it('returns the time localization for that date', function() {
             var result = instance.localize(date, { type: 'time' });
-            assert.equal(result, '07:09');
+            assert.equal(result, '22:09');
           });
         });
 
@@ -655,63 +657,63 @@ describe('translate', function() {
         describe('with type = "datetime" and format = "default"', function() {
           it('returns the default localization for that date', function() {
             var result = instance.localize(date, { type: 'datetime', format: 'default' });
-            assert.equal(result, 'Thu, 6 Feb 2014 07:09');
+            assert.equal(result, 'Wed, 5 Feb 2014 22:09');
           });
         });
 
         describe('with type = "datetime" and format = "short"', function() {
           it('returns the short datetime localization for that date', function() {
             var result = instance.localize(date, { type: 'datetime', format: 'short' });
-            assert.equal(result, '6 Feb 07:09');
+            assert.equal(result, '5 Feb 22:09');
           });
         });
 
         describe('with type = "datetime" and format = "long"', function() {
           it('returns the long datetime localization for that date', function() {
             var result = instance.localize(date, { type: 'datetime', format: 'long' });
-            assert.equal(result, 'Thursday, February 6th, 2014 07:09:04 +01:00');
+            assert.equal(result, 'Wednesday, February 5th, 2014 22:09:04 -06:00');
           });
         });
 
         describe('with type = "time" and format = "default"', function() {
           it('returns the default time localization for that date', function() {
             var result = instance.localize(date, { type: 'time', format: 'default' });
-            assert.equal(result, '07:09');
+            assert.equal(result, '22:09');
           });
         });
 
         describe('with type = "time" and format = "short"', function() {
           it('returns the short time localization for that date', function() {
             var result = instance.localize(date, { type: 'time', format: 'short' });
-            assert.equal(result, '07:09');
+            assert.equal(result, '22:09');
           });
         });
 
         describe('with type = "time" and format = "long"', function() {
           it('returns the long time localization for that date', function() {
             var result = instance.localize(date, { type: 'time', format: 'long' });
-            assert.equal(result, '07:09:04 +01:00');
+            assert.equal(result, '22:09:04 -06:00');
           });
         });
 
         describe('with type = "date" and format = "default"', function() {
           it('returns the default date localization for that date', function() {
             var result = instance.localize(date, { type: 'date', format: 'default' });
-            assert.equal(result, 'Thu, 6 Feb 2014');
+            assert.equal(result, 'Wed, 5 Feb 2014');
           });
         });
 
         describe('with type = "date" and format = "short"', function() {
           it('returns the short date localization for that date', function() {
             var result = instance.localize(date, { type: 'date', format: 'short' });
-            assert.equal(result, 'Feb 6');
+            assert.equal(result, 'Feb 5');
           });
         });
 
         describe('with type = "date" and format = "long"', function() {
           it('returns the long date localization for that date', function() {
             var result = instance.localize(date, { type: 'date', format: 'long' });
-            assert.equal(result, 'Thursday, February 6th, 2014');
+            assert.equal(result, 'Wednesday, February 5th, 2014');
           });
         });
 
@@ -738,7 +740,7 @@ describe('translate', function() {
         describe('without providing options as second argument', function() {
           it('returns the default localization for that date', function() {
             var result = instance.localize(date);
-            assert.equal(result, 'Do, 6. Feb 2014, 07:09 Uhr');
+            assert.equal(result, 'Mi, 5. Feb 2014, 22:09 Uhr');
           });
         });
 
@@ -746,21 +748,21 @@ describe('translate', function() {
           describe('with format = "default"', function() {
             it('returns the default localization for that date', function() {
               var result = instance.localize(date, { format: 'default' });
-              assert.equal(result, 'Do, 6. Feb 2014, 07:09 Uhr');
+              assert.equal(result, 'Mi, 5. Feb 2014, 22:09 Uhr');
             });
           });
 
           describe('with format = "short"', function() {
             it('returns the short localization for that date', function() {
               var result = instance.localize(date, { format: 'short' });
-              assert.equal(result, '06.02.14 07:09');
+              assert.equal(result, '05.02.14 22:09');
             });
           });
 
           describe('with format = "long"', function() {
             it('returns the long localization for that date', function() {
               var result = instance.localize(date, { format: 'long' });
-              assert.equal(result, 'Donnerstag, 6. Februar 2014, 07:09:04 +01:00');
+              assert.equal(result, 'Mittwoch, 5. Februar 2014, 22:09:04 -06:00');
             });
           });
 
@@ -776,21 +778,21 @@ describe('translate', function() {
           describe('with type = "datetime"', function() {
             it('returns the default localization for that date', function() {
               var result = instance.localize(date, { type: 'datetime' });
-              assert.equal(result, 'Do, 6. Feb 2014, 07:09 Uhr');
+              assert.equal(result, 'Mi, 5. Feb 2014, 22:09 Uhr');
             });
           });
 
           describe('with type = "date"', function() {
             it('returns the date localization for that date', function() {
               var result = instance.localize(date, { type: 'date' });
-              assert.equal(result, 'Do, 6. Feb 2014');
+              assert.equal(result, 'Mi, 5. Feb 2014');
             });
           });
 
           describe('with type = "time"', function() {
             it('returns the time localization for that date', function() {
               var result = instance.localize(date, { type: 'time' });
-              assert.equal(result, '07:09 Uhr');
+              assert.equal(result, '22:09 Uhr');
             });
           });
 
@@ -806,63 +808,63 @@ describe('translate', function() {
           describe('with type = "datetime" and format = "default"', function() {
             it('returns the default localization for that date', function() {
               var result = instance.localize(date, { type: 'datetime', format: 'default' });
-              assert.equal(result, 'Do, 6. Feb 2014, 07:09 Uhr');
+              assert.equal(result, 'Mi, 5. Feb 2014, 22:09 Uhr');
             });
           });
 
           describe('with type = "datetime" and format = "short"', function() {
             it('returns the short datetime localization for that date', function() {
               var result = instance.localize(date, { type: 'datetime', format: 'short' });
-              assert.equal(result, '06.02.14 07:09');
+              assert.equal(result, '05.02.14 22:09');
             });
           });
 
           describe('with type = "datetime" and format = "long"', function() {
             it('returns the long datetime localization for that date', function() {
               var result = instance.localize(date, { type: 'datetime', format: 'long' });
-              assert.equal(result, 'Donnerstag, 6. Februar 2014, 07:09:04 +01:00');
+              assert.equal(result, 'Mittwoch, 5. Februar 2014, 22:09:04 -06:00');
             });
           });
 
           describe('with type = "time" and format = "default"', function() {
             it('returns the default time localization for that date', function() {
               var result = instance.localize(date, { type: 'time', format: 'default' });
-              assert.equal(result, '07:09 Uhr');
+              assert.equal(result, '22:09 Uhr');
             });
           });
 
           describe('with type = "time" and format = "short"', function() {
             it('returns the short time localization for that date', function() {
               var result = instance.localize(date, { type: 'time', format: 'short' });
-              assert.equal(result, '07:09');
+              assert.equal(result, '22:09');
             });
           });
 
           describe('with type = "time" and format = "long"', function() {
             it('returns the long time localization for that date', function() {
               var result = instance.localize(date, { type: 'time', format: 'long' });
-              assert.equal(result, '07:09:04 +01:00');
+              assert.equal(result, '22:09:04 -06:00');
             });
           });
 
           describe('with type = "date" and format = "default"', function() {
             it('returns the default date localization for that date', function() {
               var result = instance.localize(date, { type: 'date', format: 'default' });
-              assert.equal(result, 'Do, 6. Feb 2014');
+              assert.equal(result, 'Mi, 5. Feb 2014');
             });
           });
 
           describe('with type = "date" and format = "short"', function() {
             it('returns the short date localization for that date', function() {
               var result = instance.localize(date, { type: 'date', format: 'short' });
-              assert.equal(result, '06.02.14');
+              assert.equal(result, '05.02.14');
             });
           });
 
           describe('with type = "date" and format = "long"', function() {
             it('returns the long date localization for that date', function() {
               var result = instance.localize(date, { type: 'date', format: 'long' });
-              assert.equal(result, 'Donnerstag, 6. Februar 2014');
+              assert.equal(result, 'Mittwoch, 5. Februar 2014');
             });
           });
 
@@ -979,7 +981,8 @@ describe('translate', function() {
       assert.equal(translate.withLocale('de', function() { return translate('greeting', { scope: 'my_project', name: 'Martin' }); }), 'Hallo, Martin!');
       assert.equal(translate.withLocale('de', function() { return translate('x_items', { scope: 'my_project', count: 1 }); }), '1 Stück');
 
-      var date = new Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
+      var date = new time.Date('Fri Feb 21 2014 13:46:24 GMT+0100 (CET)');
+      date.setTimezone('Europe/Amsterdam');
 
       assert.equal(translate.localize(date)                       , 'Fri, 21 Feb 2014 13:46');
       assert.equal(translate.localize(date, { format: 'short' })  , '21 Feb 13:46');

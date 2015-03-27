@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "jshint": "^2.5.10",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "time": "^0.11.1"
   }
 }
