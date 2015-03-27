@@ -275,6 +275,33 @@ describe('translate', function() {
             assert.matches(instance.translate('missing', { fallback: [':also_missing', ':foo.missed'] }), /missing translation/);
           });
         });
+
+        describe('with a global `fallbackLocale` present', function() {
+          it('returns the entry of the fallback locale', function() {
+            instance.registerTranslations('de', { bar: { baz: 'bam' } });
+            instance.registerTranslations('de', { hello: 'Hallo %(name)s!' });
+
+            assert.equal(instance.translate('baz', { locale: 'foo', scope: 'bar' }), 'missing translation: foo.bar.baz');
+            assert.equal(instance.translate('hello', { locale: 'foo', name: 'Martin' }), 'missing translation: foo.hello');
+
+            var previousFallbackLocale = instance.setFallbackLocale('de');
+
+            assert.equal(instance.translate('baz', { locale: 'foo', scope: 'bar' }), 'bam');
+            assert.equal(instance.translate('hello', { locale: 'foo', name: 'Martin' }), 'Hallo Martin!');
+
+            instance.setFallbackLocale(previousFallbackLocale);
+          });
+        });
+
+        describe('with a `fallbackLocale` provided as option', function() {
+          it('returns the entry of the fallback locale', function() {
+            instance.registerTranslations('en', { bar: { baz: 'bam' } });
+            instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+
+            assert.equal(instance.translate('baz', { locale: 'foo', scope: 'bar', fallbackLocale: 'en' }), 'bam');
+            assert.equal(instance.translate('hello', { locale: 'foo', fallbackLocale: 'en', name: 'Martin' }), 'Hello, Martin!');
+          });
+        });
       });
     });
 
@@ -342,6 +369,37 @@ describe('translate', function() {
         instance.offLocaleChange(handler);
         setTimeout(done, 100);
       });
+    });
+  });
+
+  describe('#getFallbackLocale', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.getFallbackLocale);
+    });
+
+    it('returns the fallback locale stored in the registry', function() {
+      assert.equal(instance.getFallbackLocale(), instance._registry.fallbackLocale);
+    });
+
+    it('returns null by default', function() {
+      assert.strictEqual(instance.getFallbackLocale(), null);
+    });
+  });
+
+  describe('#setFallbackLocale', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.setFallbackLocale);
+    });
+
+    it('sets the fallback locale stored in the registry', function() {
+      instance.setFallbackLocale('foo');
+      assert.equal(instance._registry.fallbackLocale, 'foo');
+    });
+
+    it('returns the previous fallback locale that was stored in the registry', function() {
+      var current  = instance.getFallbackLocale();
+      var previous = instance.setFallbackLocale(current + 'x');
+      assert.equal(previous, current);
     });
   });
 

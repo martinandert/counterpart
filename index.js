@@ -19,13 +19,32 @@ function isFunction(val) {
   return typeof val === 'function' || Object.prototype.toString.call(val) === '[object Function]';
 }
 
+function isPlainObject(val) {
+  return Object.prototype.toString.call(val) === '[object Object]';
+}
+
 function isSymbol(key) {
   return isString(key) && key[0] === ':';
+}
+
+function hasOwnProp(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+function getEntry(translations, keys) {
+  return keys.reduce(function(result, key) {
+    if (isPlainObject(result) && hasOwnProp(result, key)) {
+      return result[key];
+    } else {
+      return null;
+    }
+  }, translations);
 }
 
 function Counterpart() {
   this._registry = {
     locale: 'en',
+    fallbackLocale: null,
     scope: null,
     translations: {},
     interpolations: {},
@@ -51,6 +70,16 @@ Counterpart.prototype.setLocale = function(value) {
     this.emit('localechange', value, previous);
   }
 
+  return previous;
+};
+
+Counterpart.prototype.getFallbackLocale = function() {
+  return this._registry.fallbackLocale;
+};
+
+Counterpart.prototype.setFallbackLocale = function(value) {
+  var previous = this._registry.fallbackLocale;
+  this._registry.fallbackLocale = value;
   return previous;
 };
 
@@ -105,18 +134,24 @@ Counterpart.prototype.translate = function(key, options) {
   var separator = options.separator || this._registry.separator;
   delete options.separator;
 
+  var fallbackLocale = options.fallbackLocale || this._registry.fallbackLocale;
+  delete options.fallbackLocale;
+
   var keys = this._normalizeKeys(locale, scope, key, separator);
 
-  var entry = keys.reduce(function(result, key) {
-    if (Object.prototype.toString.call(result) === '[object Object]' && Object.prototype.hasOwnProperty.call(result, key)) {
-      return result[key];
-    } else {
-      return null;
-    }
-  }, this._registry.translations);
+  var entry = getEntry(this._registry.translations, keys);
 
   if (entry === null && options.fallback) {
     entry = this._fallback(locale, scope, key, options.fallback, options);
+  }
+
+  if (entry === null && fallbackLocale && locale !== fallbackLocale) {
+    var fallbackKeys = this._normalizeKeys(fallbackLocale, scope, key, separator);
+    entry = getEntry(this._registry.translations, fallbackKeys);
+
+    if (entry) {
+      locale = fallbackLocale;
+    }
   }
 
   if (entry === null) {
