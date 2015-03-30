@@ -403,6 +403,33 @@ describe('translate', function() {
     });
   });
 
+  describe('#getAvailableLocales', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.getAvailableLocales);
+    });
+
+    it('returns the locales of the registered translations by default', function() {
+      assert.deepEqual(instance.getAvailableLocales(), Object.keys(instance._registry.translations));
+    });
+  });
+
+  describe('#setAvailableLocales', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.setAvailableLocales);
+    });
+
+    it('sets the locales available', function() {
+      instance.setAvailableLocales(['foo', 'bar']);
+      assert.deepEqual(instance._registry.availableLocales, ['foo', 'bar']);
+    });
+
+    it('returns the previous available locales', function() {
+      var current  = instance.getAvailableLocales();
+      var previous = instance.setAvailableLocales(current.concat('x'));
+      assert.deepEqual(previous, current);
+    });
+  });
+
   describe('#withLocale', function() {
     it('is a function', function() {
       assert.isFunction(instance.withLocale);

@@ -83,6 +83,16 @@ Counterpart.prototype.setFallbackLocale = function(value) {
   return previous;
 };
 
+Counterpart.prototype.getAvailableLocales = function() {
+  return this._registry.availableLocales || Object.keys(this._registry.translations);
+};
+
+Counterpart.prototype.setAvailableLocales = function(value) {
+  var previous = this.getAvailableLocales();
+  this._registry.availableLocales = value;
+  return previous;
+};
+
 Counterpart.prototype.getSeparator = function() {
   return this._registry.separator;
 };
