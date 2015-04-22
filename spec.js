@@ -617,6 +617,28 @@ describe('translate', function() {
     });
   });
 
+  describe('#setInterpolate', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.setInterpolate);
+    });
+
+    it('sets the interpolate stored in the registry', function() {
+      var prev = instance._registry.interpolate;
+
+      instance.setInterpolate(true);
+      assert.equal(instance._registry.interpolate, true);
+
+      instance._registry.interpolate = prev;
+    });
+
+    it('returns the previous interpolate that was stored in the registry', function() {
+      var current  = instance.getInterpolate();
+      var previous = instance.setInterpolate(true);
+      assert.equal(previous, current);
+      instance.setInterpolate(current);
+    });
+  });
+
   describe('#withSeparator', function() {
     it('is a function', function() {
       assert.isFunction(instance.withSeparator);
