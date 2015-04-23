@@ -314,6 +314,24 @@ describe('translate', function() {
         }
       });
     });
+
+    describe('with global interpolate setting set to false', function() {
+      it('will not interpolate', function() {
+        var current = instance._registry.interpolations;
+
+        instance.registerTranslations('en', { 'hello':'Hello from %(brand)s!' });
+        instance.registerInterpolations({ brand: 'Z' });
+
+        assert.equal(instance.translate('hello'), 'Hello from Z!');
+
+        var prev = instance.setInterpolate(false);
+        assert.equal(instance.translate('hello'), 'Hello from %(brand)s!');
+        assert.equal(instance.translate('hello', { interpolate: true }), 'Hello from %(brand)s!');
+        instance.setInterpolate(prev);
+
+        instance._registry.interpolations = current;
+      });
+    });
   });
 
   describe('#translate', function() {
@@ -614,6 +632,20 @@ describe('translate', function() {
       var previous = instance.setSeparator(current + 'x');
       assert.equal(previous, current);
       instance.setSeparator(current);
+    });
+  });
+
+  describe('#getInterpolate', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.getInterpolate);
+    });
+
+    it('returns the setting stored in the registry', function() {
+      assert.equal(instance.getInterpolate(), instance._registry.interpolate);
+    });
+
+    it('returns true by default', function() {
+      assert.equal(instance.getInterpolate(), true);
     });
   });
 
