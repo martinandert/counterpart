@@ -44,6 +44,7 @@ function getEntry(translations, keys) {
 function Counterpart() {
   this._registry = {
     locale: 'en',
+    interpolate: true,
     fallbackLocale: null,
     scope: null,
     translations: {},
@@ -101,6 +102,16 @@ Counterpart.prototype.setSeparator = function(value) {
   var previous = this._registry.separator;
   this._registry.separator = value;
   return previous;
+};
+
+Counterpart.prototype.setInterpolate = function(value) {
+  var previous = this._registry.interpolate;
+  this._registry.interpolate = value;
+  return previous;
+};
+
+Counterpart.prototype.getInterpolate = function() {
+  return this._registry.interpolate;
 };
 
 Counterpart.prototype.registerTranslations = function(locale, data) {
@@ -170,7 +181,7 @@ Counterpart.prototype.translate = function(key, options) {
 
   entry = this._pluralize(locale, entry, options.count);
 
-  if (options.interpolate !== false) {
+  if (this._registry.interpolate !== false && options.interpolate !== false) {
     entry = this._interpolate(entry, options);
   }
 
