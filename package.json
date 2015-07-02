@@ -36,7 +36,7 @@
   "dependencies": {
     "date-names": "^0.1.4",
     "except": "^0.1.3",
-    "extend": "^2.0.0",
+    "extend": "^3.0.0",
     "pluralizers": "^0.1.1",
     "sprintf": "^0.1.5"
   },
