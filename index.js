@@ -20,6 +20,10 @@ function isFunction(val) {
 }
 
 function isPlainObject(val) {
+  //Deal with older browsers (IE8) that don't return [object Null] in this case.
+  if (val === null) {
+    return false;
+  }
   return Object.prototype.toString.call(val) === '[object Object]';
 }
 
