@@ -139,6 +139,16 @@ Counterpart.prototype.removeLocaleChangeListener = function(callback) {
   this.removeListener('localechange', callback);
 };
 
+Counterpart.prototype.onTranslationNotFound =
+Counterpart.prototype.addTranslationNotFoundListener = function(callback) {
+  this.addListener('translationnotfound', callback);
+};
+
+Counterpart.prototype.offTranslationNotFound =
+Counterpart.prototype.removeTranslationNotFoundListener = function(callback) {
+  this.removeListener('translationnotfound', callback);
+};
+
 Counterpart.prototype.translate = function(key, options) {
   if (!isArray(key) && !isString(key) || !key.length) {
     throw new Error('invalid argument: key');
@@ -167,6 +177,7 @@ Counterpart.prototype.translate = function(key, options) {
   var entry = getEntry(this._registry.translations, keys);
 
   if (entry === null && options.fallback) {
+    this.emit('translationnotfound', locale, key, options.fallback);
     entry = this._fallback(locale, scope, key, options.fallback, options);
   }
 
