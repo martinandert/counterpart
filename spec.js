@@ -599,6 +599,74 @@ describe('translate', function() {
     });
   });
 
+  describe('#onTranslationNotFound', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.onTranslationNotFound);
+    });
+
+    it('is called when the translation is missing and a fallback is provided as option', function(done) {
+      var handler = function() { done(); };
+      instance.onTranslationNotFound(handler);
+      instance.translate('foo', { fallback: 'bar' });
+      instance.offTranslationNotFound(handler);
+    });
+
+    it('is not called when the translation is missing and no fallback is provided as option', function(done) {
+      var handler = function() { done('function was called'); };
+      instance.onTranslationNotFound(handler);
+      instance.translate('foo', { fallback: undefined });
+      instance.offTranslationNotFound(handler);
+      setTimeout(done, 100);
+    });
+
+    it('is not called when a translation exists', function(done) {
+      var handler = function() { done('function was called'); };
+      instance.registerTranslations('xx', { foo: 'bar' });
+      instance.onTranslationNotFound(handler);
+      instance.translate('foo', { locale: 'xx', fallback: 'baz' });
+      instance.offTranslationNotFound(handler);
+      setTimeout(done, 100);
+    });
+
+    describe('when called', function() {
+      it('exposes the current locale, key, and fallback as arguments', function(done) {
+        var handler = function(locale, key, fallback) {
+          assert.equal('yy', locale);
+          assert.equal('foo', key);
+          assert.equal('bar', fallback);
+          done();
+        };
+
+        instance.onTranslationNotFound(handler);
+        instance.translate('foo', { locale: 'yy', fallback: 'bar' });
+        instance.offTranslationNotFound(handler);
+      });
+    });
+  });
+
+  describe('#offTranslationNotFound', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.offTranslationNotFound);
+    });
+
+    it('stops the emission of events to the handler', function(done) {
+      var count = 0;
+
+      var handler = function() { count++; };
+
+      instance.onTranslationNotFound(handler);
+      instance.translate('foo', { fallback: 'bar' });
+      instance.translate('foo', { fallback: 'bar' });
+      instance.offTranslationNotFound(handler);
+      instance.translate('foo', { fallback: 'bar' });
+
+      setTimeout(function() {
+        assert.equal(count, 2, 'handler was called although deactivated');
+        done();
+      }, 100);
+    });
+  });
+
   describe('#getSeparator', function() {
     it('is a function', function() {
       assert.isFunction(instance.getSeparator);
