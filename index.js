@@ -3,7 +3,7 @@
 var extend  = require('extend');
 var isArray = require('util').isArray;
 var isDate  = require('util').isDate;
-var sprintf = require('sprintf').sprintf;
+var sprintf = require("sprintf-js").sprintf;
 var events  = require('events');
 var except  = require('except');
 
