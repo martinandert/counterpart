@@ -739,6 +739,54 @@ describe('translate', function() {
     });
   });
 
+  describe('#getKeyTransformer', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.getKeyTransformer);
+    });
+
+    it('returns the setting stored in the registry', function() {
+      assert.equal(instance.getKeyTransformer(), instance._registry.keyTransformer);
+    });
+  });
+
+  describe('#setKeyTransformer', function() {
+    var transformer = function(key, options) {
+      assert.deepEqual({ locale: 'xx', bingo: 'bongo' }, options);
+      return key.toLowerCase();
+    };
+
+    it('is a function', function() {
+      assert.isFunction(instance.setKeyTransformer);
+    });
+
+    it('sets the keyTransformer stored in the registry', function() {
+      var prev = instance._registry.keyTransformer;
+
+      instance.setKeyTransformer(transformer);
+      assert.equal(instance._registry.keyTransformer, transformer);
+
+      instance._registry.keyTransformer = prev;
+    });
+
+    it('returns the previous keyTransformer that was stored in the registry', function() {
+      var current  = instance.getKeyTransformer();
+      var previous = instance.setKeyTransformer(transformer);
+      assert.equal(previous, current);
+      instance.setKeyTransformer(current);
+    });
+
+    it('uses the custom key transformer when translating', function() {
+      instance.registerTranslations('xx', { foo: 'bar' });
+
+      var translation = instance.translate('FOO', { locale: 'xx', bingo: 'bongo' });
+      assert.matches(translation, /missing translation/);
+
+      instance.setKeyTransformer(transformer);
+      translation = instance.translate('FOO', { locale: 'xx', bingo: 'bongo' });
+      assert.equal('bar', translation);
+    });
+  });
+
   describe('#withSeparator', function() {
     it('is a function', function() {
       assert.isFunction(instance.withSeparator);

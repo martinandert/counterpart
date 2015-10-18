@@ -54,7 +54,8 @@ function Counterpart() {
     translations: {},
     interpolations: {},
     normalizedKeys: {},
-    separator: '.'
+    separator: '.',
+    keyTransformer: function(key) { return key; }
   };
 
   this.registerTranslations('en', require('./locales/en'));
@@ -118,6 +119,16 @@ Counterpart.prototype.getInterpolate = function() {
   return this._registry.interpolate;
 };
 
+Counterpart.prototype.setKeyTransformer = function(value) {
+  var previous = this._registry.keyTransformer;
+  this._registry.keyTransformer = value;
+  return previous;
+};
+
+Counterpart.prototype.getKeyTransformer = function() {
+  return this._registry.keyTransformer;
+};
+
 Counterpart.prototype.registerTranslations = function(locale, data) {
   var translations = {};
   translations[locale] = data;
@@ -157,6 +168,8 @@ Counterpart.prototype.translate = function(key, options) {
   if (isSymbol(key)) {
     key = key.substr(1);
   }
+
+  key = this._registry.keyTransformer(key, options);
 
   options = extend(true, {}, options);
 

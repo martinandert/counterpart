@@ -236,6 +236,18 @@ translate('my_namespace.greeting', { visitor: 'Martin', app_name: 'The Foo App' 
 
 As you can see in the last line of the example, interpolations you give as options to the `translate` function take precedence over registered interpolations.
 
+### Using a key transformer
+
+Sometimes it is necessary to adjust the given translation key before the actual translation is made, e.g. when keys are passed in mixed case and you expect them to be all lower case. Use `setKeyTransformer` to provide your own transformation function:
+
+```js
+translate.setKeyTransformer(function(key, options) {
+  return key.toLowerCase();
+});
+```
+
+Counterpart's built-in key transformer just returns the given key argument.
+
 ### Localization
 
 The counterpart package comes with support for localizing JavaScript Date objects. The `localize` function expects a date and options as arguments. The following example demonstrates the possible options.
