@@ -209,6 +209,28 @@ describe('translate', function() {
             });
           });
         });
+
+        describe('with the keepTrailingDot setting set to true', function() {
+          it('returns the translation for keys that contain a trailing dot', function() {
+            instance.registerTranslations('fr', { foo: { bar: 'baz', 'With a dot.': 'Avec un point.' }, 'dot.': 'point.' });
+            instance._registry.keepTrailingDot = true;
+
+            instance.withLocale('fr', function() {
+              assert.equal(instance.translate('foo.bar'),  'baz');
+              assert.equal(instance.translate('foo.With a dot.'),  'Avec un point.');
+              assert.equal(instance.translate('dot.'),  'point.');
+
+              assert.equal(instance.translate('foo..bar'),  'baz');
+              assert.equal(instance.translate('foo..With a dot.'),  'Avec un point.');
+              assert.equal(instance.translate('.dot.'),  'point.');
+
+              assert.equal(instance.translate('foo.bar.'),  'missing translation: fr.foo.bar.');
+              assert.equal(instance.translate('foo.With a dot..'),  'missing translation: fr.foo.With a dot..');
+              assert.equal(instance.translate('foo.With. a dot.'),  'missing translation: fr.foo.With. a dot.');
+              assert.equal(instance.translate('dot..'),  'missing translation: fr.dot..');
+            });
+          });
+        });
       });
 
       describe('with a translation for a prefix of the key present', function() {
