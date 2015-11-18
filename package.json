@@ -18,6 +18,10 @@
     "translate",
     "localize"
   ],
+  "scripts": {
+    "test": "make test",
+    "lint": "make lint"
+  },
   "author": {
     "name": "Martin Andert",
     "email": "mandert@gmail.com"
