@@ -55,6 +55,7 @@ function Counterpart() {
     interpolations: {},
     normalizedKeys: {},
     separator: '.',
+    keepTrailingDot: false,
     keyTransformer: function(key) { return key; }
   };
 
@@ -299,6 +300,10 @@ Counterpart.prototype._normalizeKey = function(key, separator) {
       for (var i = keys.length - 1; i >= 0; i--) {
         if (keys[i] === '') {
           keys.splice(i, 1);
+
+          if (this._registry.keepTrailingDot === true && i == keys.length) {
+            keys[keys.length - 1] += '' + separator;
+          }
         }
       }
 
