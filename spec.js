@@ -1153,6 +1153,7 @@ describe('translate', function() {
           });
         });
       });
+
       describe('with locale set to "pt-br"', function() {
         var prev;
 

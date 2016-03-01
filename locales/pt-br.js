@@ -1,5 +1,8 @@
-// The translations in this file are added by default.
+// The translations in this file can be added with:
+//   #registerTranslations('pt-br', require('counterpart/locales/pt-br');
+
 'use strict';
+
 module.exports = {
   counterpart: {
     names: require('date-names/pt-br'),

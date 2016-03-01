@@ -1,5 +1,7 @@
 // The translations in this file are added by default.
 
+'use strict';
+
 module.exports = {
   counterpart: {
     names: require('date-names/en'),

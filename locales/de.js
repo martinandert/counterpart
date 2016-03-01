@@ -1,6 +1,8 @@
 // The translations in this file can be added with:
 //   #registerTranslations('de', require('counterpart/locales/de');
 
+'use strict';
+
 module.exports = {
   counterpart: {
     names: require('date-names/de'),
