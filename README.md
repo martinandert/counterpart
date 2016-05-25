@@ -114,8 +114,6 @@ Translation data can contain pluralized translations. Pluralized translations ar
 }
 ```
 
-The name of the option to select a specific pluralization must be count.
-
 Then use the `count` option to select a specific pluralization:
 
 ```js
