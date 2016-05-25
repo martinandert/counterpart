@@ -114,6 +114,8 @@ Translation data can contain pluralized translations. Pluralized translations ar
 }
 ```
 
+The name of the option to select a specific pluralization must be count.
+
 Then use the `count` option to select a specific pluralization:
 
 ```js
@@ -121,6 +123,8 @@ translate('x_items', { count: 0  })  // => 'No items.'
 translate('x_items', { count: 1  })  // => 'One item.'
 translate('x_items', { count: 42 })  // => '42 items.'
 ```
+
+The name of the option to select a pluralization is always `count`, don't use `itemsCount` or anything like that.
 
 Note that this library currently only supports an algorithm for English-like pluralization rules (see [locales/en.js](locales/en.js). You can easily add  pluralization algorithms for other locales by [adding custom translation data](#adding-translation-data) to the "counterpart" namespace. Pull requests are welcome.
 
