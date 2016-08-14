@@ -10,7 +10,6 @@ var except  = require('except');
 var strftime = require('./strftime');
 
 var translationScope = 'counterpart';
-var interpolationArg = /\%\(([_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*)\)[bcdijefgosuvxX]/;
 
 function isString(val) {
   return typeof val === 'string' || Object.prototype.toString.call(val) === '[object String]';
@@ -34,12 +33,6 @@ function isSymbol(key) {
 
 function hasOwnProp(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
-}
-
-function interpolationArgsOf(str) {
-  return str.split(interpolationArg).filter(function(item, index) {
-    return index % 2 == 1;
-  });
 }
 
 function getEntry(translations, keys) {
@@ -168,7 +161,7 @@ Counterpart.prototype.removeTranslationNotFoundListener = function(callback) {
   this.removeListener('translationnotfound', callback);
 };
 
-Counterpart.prototype.translate = function(key, args, deleteTranslationArgs) {
+Counterpart.prototype.translate = function(key, options) {
   if (!isArray(key) && !isString(key) || !key.length) {
     throw new Error('invalid argument: key');
   }
@@ -177,9 +170,9 @@ Counterpart.prototype.translate = function(key, args, deleteTranslationArgs) {
     key = key.substr(1);
   }
 
-  var options = extend(true, {}, args);
-
   key = this._registry.keyTransformer(key, options);
+
+  options = extend(true, {}, options);
 
   var locale = options.locale || this._registry.locale;
   delete options.locale;
@@ -216,19 +209,6 @@ Counterpart.prototype.translate = function(key, args, deleteTranslationArgs) {
   }
 
   entry = this._pluralize(locale, entry, options.count);
-
-  if (isString(entry) && deleteTranslationArgs) {
-    delete args.locale;
-    delete args.scope;
-    delete args.separator;
-    delete args.fallbackLocale;
-    delete args.fallback;
-    delete args.count;
-
-    interpolationArgsOf(entry).forEach(function(arg) {
-      delete args[arg];
-    });
-  }
 
   if (this._registry.interpolate !== false && options.interpolate !== false) {
     entry = this._interpolate(entry, options);
