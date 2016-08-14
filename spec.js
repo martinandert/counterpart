@@ -354,6 +354,24 @@ describe('translate', function() {
         instance._registry.interpolations = current;
       });
     });
+
+    describe('with third argument set to true', function() {
+      it('deletes translation args from the second argument', function() {
+        instance.registerTranslations('en', { abc: { xyz: '%(foo)s b%(bar)xc %(baz)X d' } });
+
+        var args = { locale: 'en', scope: 'abc', foo: 'str', bar: 255, baz: 255, bam: 'bam' };
+
+        assert.equal(instance.translate('xyz', args, true), 'str bffc FF d');
+
+        assert.not('locale' in args);
+        assert.not('scope' in args);
+        assert.not('foo' in args);
+        assert.not('bar' in args);
+        assert.not('baz' in args);
+
+        assert('bam' in args);
+      })
+    });
   });
 
   describe('#translate', function() {
@@ -1446,6 +1464,10 @@ describe('translate', function() {
 
 
 /* Helper Functions */
+
+assert.not = function(value, message) {
+  assert.equal(!!value, false, message);
+};
 
 assert.isString = function(value, message) {
   assert.equal(Object.prototype.toString.call(value), '[object String]', message || (value + ' is not a string'));
