@@ -376,7 +376,8 @@ function translate() {
 }
 
 extend(translate, instance, {
-  Instance: Counterpart
+  Instance: Counterpart,
+  Translator: Counterpart
 });
 
 module.exports = translate;

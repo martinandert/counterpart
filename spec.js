@@ -1,13 +1,13 @@
-var assert    = require('assert');
-var time      = require('time');
+var assert = require('assert');
+var time = require('time');
 var translate = require('./');
-var Instance  = translate.Instance;
+var Translator = translate.Translator;
 
 describe('translate', function() {
   var instance;
 
   beforeEach(function() {
-    instance = new Instance();
+    instance = new Translator();
   });
 
   it('is a function', function() {
