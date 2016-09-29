@@ -6,7 +6,7 @@ test: lint
 lint: node_modules/
 	@$(BIN)/jshint index.js strftime.js locales/
 
-node_modules/:
+install:
 	@npm install
 
 release-patch: test
