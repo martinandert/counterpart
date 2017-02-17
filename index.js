@@ -86,7 +86,7 @@ Counterpart.prototype.getFallbackLocale = function() {
 
 Counterpart.prototype.setFallbackLocale = function(value) {
   var previous = this._registry.fallbackLocales;
-  this._registry.fallbackLocales = [].concat(value);
+  this._registry.fallbackLocales = [].concat(value || []);
   return previous;
 };
 
