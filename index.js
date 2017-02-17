@@ -49,7 +49,7 @@ function Counterpart() {
   this._registry = {
     locale: 'en',
     interpolate: true,
-    fallbackLocale: null,
+    fallbackLocales: [],
     scope: null,
     translations: {},
     interpolations: {},
@@ -81,12 +81,12 @@ Counterpart.prototype.setLocale = function(value) {
 };
 
 Counterpart.prototype.getFallbackLocale = function() {
-  return this._registry.fallbackLocale;
+  return this._registry.fallbackLocales;
 };
 
 Counterpart.prototype.setFallbackLocale = function(value) {
-  var previous = this._registry.fallbackLocale;
-  this._registry.fallbackLocale = value;
+  var previous = this._registry.fallbackLocales;
+  this._registry.fallbackLocales = [].concat(value);
   return previous;
 };
 
@@ -183,7 +183,7 @@ Counterpart.prototype.translate = function(key, options) {
   var separator = options.separator || this._registry.separator;
   delete options.separator;
 
-  var fallbackLocale = options.fallbackLocale || this._registry.fallbackLocale;
+  var fallbackLocales = [].concat(options.fallbackLocale || this._registry.fallbackLocales);
   delete options.fallbackLocale;
 
   var keys = this._normalizeKeys(locale, scope, key, separator);
@@ -195,12 +195,16 @@ Counterpart.prototype.translate = function(key, options) {
     entry = this._fallback(locale, scope, key, options.fallback, options);
   }
 
-  if (entry === null && fallbackLocale && locale !== fallbackLocale) {
-    var fallbackKeys = this._normalizeKeys(fallbackLocale, scope, key, separator);
-    entry = getEntry(this._registry.translations, fallbackKeys);
+  if (entry === null && fallbackLocales.length > 0 && fallbackLocales.indexOf(locale) === -1) {
+    for (var ix in fallbackLocales) {
+      var fallbackLocale = fallbackLocales[ix];
+      var fallbackKeys = this._normalizeKeys(fallbackLocale, scope, key, separator);
+      entry = getEntry(this._registry.translations, fallbackKeys);
 
-    if (entry) {
-      locale = fallbackLocale;
+      if (entry) {
+        locale = fallbackLocale;
+        break;
+      }
     }
   }
 
