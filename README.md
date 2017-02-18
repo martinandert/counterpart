@@ -138,8 +138,6 @@ To mitigate this, provide the `fallback` option with an alternate text. The foll
 translate('baz', { fallback: 'default' })
 ```
 
-You can use interpolations with the `fallback` option, too.
-
 ### Locales
 
 The default locale is English ("en"). To change this, call the `setLocale` function:
@@ -177,6 +175,27 @@ translate('foo', { locale: 'de' });
 ```
 
 There are also `withScope` and `withSeparator` functions that behave exactly the same as `withLocale`.
+
+### Fallback Locales
+
+You can provide entire fallback locales as alternatives to hard-coded fallbacks.
+
+```js
+translate('baz', { fallbackLocale: 'en' });
+```
+
+Fallback locales can also contain multiple potential fallbacks. These will be tried sequentially until a key returns a successful value, or the fallback locales have been exhausted.
+
+```js
+translate('baz', { fallbackLocale: [ 'foo', 'bar', 'default' ] })
+```
+
+Globally, fallback locales can be set via the `setFallbackLocale` method. 
+
+```js
+translate.setFallbackLocale('en')
+translate.setFallbackLocale([ 'bar', 'en' ]) // Can also take multiple fallback locales
+```
 
 ### Adding Translation Data
 
