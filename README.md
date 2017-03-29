@@ -138,6 +138,17 @@ To mitigate this, provide the `fallback` option with an alternate text. The foll
 translate('baz', { fallback: 'default' })
 ```
 
+When translation is missing and `fallback` option is provided, `translate` emits an event you can listen to:
+
+```js
+translate.onTranslationNotFound(function(locale, key, fallback, scope) {
+  // do important stuff here...
+});
+```
+
+Use `translate.offTranslationNotFound(myHandler)` to stop listening to missing key events.
+
+
 ### Locales
 
 The default locale is English ("en"). To change this, call the `setLocale` function:
@@ -190,7 +201,7 @@ Fallback locales can also contain multiple potential fallbacks. These will be tr
 translate('baz', { fallbackLocale: [ 'foo', 'bar', 'default' ] })
 ```
 
-Globally, fallback locales can be set via the `setFallbackLocale` method. 
+Globally, fallback locales can be set via the `setFallbackLocale` method.
 
 ```js
 translate.setFallbackLocale('en')
