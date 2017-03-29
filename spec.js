@@ -701,16 +701,17 @@ describe('translate', function() {
     });
 
     describe('when called', function() {
-      it('exposes the current locale, key, and fallback as arguments', function(done) {
-        var handler = function(locale, key, fallback) {
+      it('exposes the current locale, key, fallback and scope as arguments', function(done) {
+        var handler = function(locale, key, fallback, scope) {
           assert.equal('yy', locale);
           assert.equal('foo', key);
           assert.equal('bar', fallback);
+          assert.equal('zz', scope);
           done();
         };
 
         instance.onTranslationNotFound(handler);
-        instance.translate('foo', { locale: 'yy', fallback: 'bar' });
+        instance.translate('foo', { locale: 'yy', fallback: 'bar', scope: 'zz' });
         instance.offTranslationNotFound(handler);
       });
     });

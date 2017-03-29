@@ -191,7 +191,7 @@ Counterpart.prototype.translate = function(key, options) {
   var entry = getEntry(this._registry.translations, keys);
 
   if (entry === null && options.fallback) {
-    this.emit('translationnotfound', locale, key, options.fallback);
+    this.emit('translationnotfound', locale, key, options.fallback, scope);
     entry = this._fallback(locale, scope, key, options.fallback, options);
   }
 
