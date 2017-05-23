@@ -150,6 +150,16 @@ translate.onTranslationNotFound(function(locale, key, fallback, scope) {
 
 Use `translate.offTranslationNotFound(myHandler)` to stop listening to missing key events.
 
+As stated in the Fallbacks section, if for a key no translation could be found, `translate` returns an error string of the form "translation missing: %(key)s".
+
+You can customize this output by providing your own missing entry generator function:
+
+```js
+translate.setMissingEntryGenerator(function(key) {
+  // console.error('Missing translation: ' + key);
+  return 'OMG! No translation available for ' + key;
+});
+```
 
 ### Locales
 

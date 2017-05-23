@@ -56,7 +56,8 @@ function Counterpart() {
     normalizedKeys: {},
     separator: '.',
     keepTrailingDot: false,
-    keyTransformer: function(key) { return key; }
+    keyTransformer: function(key) { return key; },
+    generateMissingEntry: function(key) { return 'missing translation: ' + key; }
   };
 
   this.registerTranslations('en', require('./locales/en'));
@@ -128,6 +129,16 @@ Counterpart.prototype.setKeyTransformer = function(value) {
 
 Counterpart.prototype.getKeyTransformer = function() {
   return this._registry.keyTransformer;
+};
+
+Counterpart.prototype.setMissingEntryGenerator = function(value) {
+  var previous = this._registry.generateMissingEntry;
+  this._registry.generateMissingEntry = value;
+  return previous;
+};
+
+Counterpart.prototype.getMissingEntryGenerator = function() {
+  return this._registry.generateMissingEntry;
 };
 
 Counterpart.prototype.registerTranslations = function(locale, data) {
@@ -212,7 +223,7 @@ Counterpart.prototype.translate = function(key, options) {
   }
 
   if (entry === null) {
-    entry = 'missing translation: ' + keys.join(separator);
+    entry = this._registry.generateMissingEntry(keys.join(separator));
   }
 
   entry = this._pluralize(locale, entry, options.count);

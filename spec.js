@@ -852,6 +852,48 @@ describe('translate', function() {
     });
   });
 
+  describe('#getMissingEntryGenerator', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.getMissingEntryGenerator);
+    });
+
+    it('returns the setting stored in the registry', function() {
+      assert.equal(instance.getMissingEntryGenerator(), instance._registry.generateMissingEntry);
+    });
+  });
+
+  describe('#setMissingEntryGenerator', function() {
+    var generator = function(key) {
+      return 'Ooops! Translation missing for ' + key + '!!!';
+    };
+
+    it('is a function', function() {
+      assert.isFunction(instance.setMissingEntryGenerator);
+    });
+
+    it('sets the generator stored in the registry', function() {
+      var prev = instance._registry.generateMissingEntry;
+
+      instance.setMissingEntryGenerator(generator);
+      assert.equal(instance._registry.generateMissingEntry, generator);
+
+      instance._registry.generateMissingEntry = prev;
+    });
+
+    it('returns the previous generator that was stored in the registry', function() {
+      var current  = instance.getMissingEntryGenerator();
+      var previous = instance.setMissingEntryGenerator(generator);
+      assert.equal(previous, current);
+      instance.setMissingEntryGenerator(current);
+    });
+
+    it('uses the custom generator when translating', function() {
+      instance.setMissingEntryGenerator(generator);
+      var translation = instance.translate('d', { locale: 'a', scope: 'b.c' });
+      assert.equal('Ooops! Translation missing for a.b.c.d!!!', translation);
+    });
+  });
+
   describe('#withSeparator', function() {
     it('is a function', function() {
       assert.isFunction(instance.withSeparator);
