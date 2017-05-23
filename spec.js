@@ -676,19 +676,11 @@ describe('translate', function() {
       assert.isFunction(instance.onTranslationNotFound);
     });
 
-    it('is called when the translation is missing and a fallback is provided as option', function(done) {
+    it('is called when the translation is missing', function(done) {
       var handler = function() { done(); };
       instance.onTranslationNotFound(handler);
-      instance.translate('foo', { fallback: 'bar' });
+      instance.translate('foo');
       instance.offTranslationNotFound(handler);
-    });
-
-    it('is not called when the translation is missing and no fallback is provided as option', function(done) {
-      var handler = function() { done('function was called'); };
-      instance.onTranslationNotFound(handler);
-      instance.translate('foo', { fallback: undefined });
-      instance.offTranslationNotFound(handler);
-      setTimeout(done, 100);
     });
 
     it('is not called when a translation exists', function(done) {

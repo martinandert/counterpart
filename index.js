@@ -190,9 +190,12 @@ Counterpart.prototype.translate = function(key, options) {
 
   var entry = getEntry(this._registry.translations, keys);
 
-  if (entry === null && options.fallback) {
+  if (entry === null) {
     this.emit('translationnotfound', locale, key, options.fallback, scope);
-    entry = this._fallback(locale, scope, key, options.fallback, options);
+
+    if (options.fallback) {
+      entry = this._fallback(locale, scope, key, options.fallback, options);
+    }
   }
 
   if (entry === null && fallbackLocales.length > 0 && fallbackLocales.indexOf(locale) === -1) {

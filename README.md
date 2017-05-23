@@ -138,7 +138,9 @@ To mitigate this, provide the `fallback` option with an alternate text. The foll
 translate('baz', { fallback: 'default' })
 ```
 
-When translation is missing and `fallback` option is provided, `translate` emits an event you can listen to:
+### Dealing with missing translations
+
+When a translation key cannot be resolved to a translation, regardless of whether a fallback is provided or not, `translate` will emit an event you can listen to:
 
 ```js
 translate.onTranslationNotFound(function(locale, key, fallback, scope) {
