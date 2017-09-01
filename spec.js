@@ -731,6 +731,73 @@ describe('translate', function() {
       }, 100);
     });
   });
+  
+  describe('#onError', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.onError);
+    });
+
+    it('is called when the translation throws', function(done) {
+      var handler = function() { done(); };
+      instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+      instance.onError(handler);
+      instance.translate('hello');
+      instance.offError(handler);
+    });
+
+    it('is not called when a translation succeeds', function(done) {
+      var handler = function() { done('function was called'); };
+      instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+      instance.onError(handler);
+      instance.translate('hello', { name: 'Martin'});
+      instance.offError(handler);
+      setTimeout(done, 100);
+    });
+
+    describe('when called', function() {
+      it('exposes the error, entry and values as arguments', function(done) {
+        var handler = function(error, entry, values) {
+          assert.notEqual(undefined, error);
+          assert.equal('Hello, %(name)s!', entry);
+          assert.deepEqual({}, values);
+          done();
+        };
+
+        instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+        instance.onError(handler);
+        instance.translate('hello');
+        instance.offError(handler);
+      });
+    });
+  });
+
+  describe('#offError', function() {
+    it('is a function', function() {
+      assert.isFunction(instance.offError);
+    });
+
+    it('stops the emission of events to the handler', function(done) {
+      var count = 0;
+
+      var handler = function() { count++; };
+
+      instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+      instance.onError(handler);
+      instance.translate('hello');
+      instance.translate('hello');
+      instance.offError(handler);
+      
+      try {
+        instance.translate('hello');
+      } 
+      catch (err) {}
+
+      setTimeout(function() {
+        assert.equal(count, 2, 'handler was called although deactivated');
+        done();
+      }, 100);
+    });
+  });
 
   describe('#getSeparator', function() {
     it('is a function', function() {
