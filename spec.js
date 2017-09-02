@@ -754,6 +754,13 @@ describe('translate', function() {
       setTimeout(done, 100);
     });
 
+    it('still throws when not listening for an error', function() {
+      instance.registerTranslations('en', { hello: 'Hello, %(name)s!' });
+      assert.throws(function() {
+        instance.translate('hello');
+      });
+    });
+
     describe('when called', function() {
       it('exposes the error, entry and values as arguments', function(done) {
         var handler = function(error, entry, values) {

@@ -350,7 +350,11 @@ Counterpart.prototype._interpolate = function(entry, values) {
   try {
     return sprintf(entry, extend({}, this._registry.interpolations, values));
   } catch (err) {
-    this.emit('error', err, entry, values);
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', err, entry, values);
+    } else {
+      throw err;
+    }
     return null;
   }
 };
