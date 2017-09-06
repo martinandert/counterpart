@@ -330,6 +330,18 @@ instance.registerTranslations('en', { foo: 'bar' });
 instance.translate('foo');
 ```
 
+### Error handling
+
+When a translation fails, `translate` will emit an event you can listen to:
+
+```js
+translate.onError(function(err, entry, values) {
+  // do some error handling here...
+});
+```
+
+Use `translate.offError(myHandler)` to stop listening for errors.
+
 ## Contributing
 
 Here's a quick guide:

@@ -172,6 +172,16 @@ Counterpart.prototype.removeTranslationNotFoundListener = function(callback) {
   this.removeListener('translationnotfound', callback);
 };
 
+Counterpart.prototype.onError =
+Counterpart.prototype.addErrorListener = function(callback) {
+  this.addListener('error', callback);
+};
+
+Counterpart.prototype.offError =
+Counterpart.prototype.removeErrorListener = function(callback) {
+  this.removeListener('error', callback);
+};
+
 Counterpart.prototype.translate = function(key, options) {
   if (!isArray(key) && !isString(key) || !key.length) {
     throw new Error('invalid argument: key');
@@ -337,7 +347,16 @@ Counterpart.prototype._interpolate = function(entry, values) {
     return entry;
   }
 
-  return sprintf(entry, extend({}, this._registry.interpolations, values));
+  try {
+    return sprintf(entry, extend({}, this._registry.interpolations, values));
+  } catch (err) {
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', err, entry, values);
+    } else {
+      throw err;
+    }
+    return null;
+  }
 };
 
 Counterpart.prototype._resolve = function(locale, scope, object, subject, options) {
