@@ -731,7 +731,7 @@ describe('translate', function() {
       }, 100);
     });
   });
-  
+
   describe('#onError', function() {
     it('is a function', function() {
       assert.isFunction(instance.onError);
@@ -793,10 +793,10 @@ describe('translate', function() {
       instance.translate('hello');
       instance.translate('hello');
       instance.offError(handler);
-      
+
       try {
         instance.translate('hello');
-      } 
+      }
       catch (err) {}
 
       setTimeout(function() {
@@ -1301,6 +1301,158 @@ describe('translate', function() {
             it('returns the long date localization for that date', function() {
               var result = instance.localize(date, { type: 'date', format: 'long' });
               assert.equal(result, 'Mittwoch, 5. Februar 2014');
+            });
+          });
+
+          describe('with unknown type and unknown format', function() {
+            it('returns a string containing "missing translation"', function() {
+              var result = instance.localize(date, { type: '__invalid__', format: '__invalid__' });
+              assert.matches(result, /missing translation/);
+            });
+          });
+        });
+      });
+
+      describe('with locale set to "nl"', function() {
+        var prev;
+
+        beforeEach(function() {
+          instance.registerTranslations('nl', require('./locales/nl'));
+          prev = instance.setLocale('nl');
+        });
+
+        afterEach(function() {
+          instance.setLocale(prev);
+        });
+
+        describe('without providing options as second argument', function() {
+          it('returns the default localization for that date', function() {
+            var result = instance.localize(date);
+            assert.equal(result, '5 feb 2014, 22.09');
+          });
+        });
+
+        describe('providing a `format` key in the options', function() {
+          describe('with format = "default"', function() {
+            it('returns the default localization for that date', function() {
+              var result = instance.localize(date, { format: 'default' });
+              assert.equal(result, '5 feb 2014, 22.09');
+            });
+          });
+
+          describe('with format = "short"', function() {
+            it('returns the short localization for that date', function() {
+              var result = instance.localize(date, { format: 'short' });
+              assert.equal(result, '2014-02-05 22.09');
+            });
+          });
+
+          describe('with format = "long"', function() {
+            it('returns the long localization for that date', function() {
+              var result = instance.localize(date, { format: 'long' });
+              assert.equal(result, 'woensdag 5 februari 2014, 22.09.04');
+            });
+          });
+
+          describe('with an unknown format', function() {
+            it('returns a string containing "missing translation"', function() {
+              var result = instance.localize(date, { format: '__invalid__' });
+              assert.matches(result, /missing translation/);
+            });
+          });
+        });
+
+        describe('providing a `type` key in the options', function() {
+          describe('with type = "datetime"', function() {
+            it('returns the default localization for that date', function() {
+              var result = instance.localize(date, { type: 'datetime' });
+              assert.equal(result, '5 feb 2014, 22.09');
+            });
+          });
+
+          describe('with type = "date"', function() {
+            it('returns the date localization for that date', function() {
+              var result = instance.localize(date, { type: 'date' });
+              assert.equal(result, '5 feb 2014');
+            });
+          });
+
+          describe('with type = "time"', function() {
+            it('returns the time localization for that date', function() {
+              var result = instance.localize(date, { type: 'time' });
+              assert.equal(result, '22.09');
+            });
+          });
+
+          describe('with an unknown type', function() {
+            it('returns a string containing "missing translation"', function() {
+              var result = instance.localize(date, { type: '__invalid__' });
+              assert.matches(result, /missing translation/);
+            });
+          });
+        });
+
+        describe('providing both a `type` key and a `format` key in the options', function() {
+          describe('with type = "datetime" and format = "default"', function() {
+            it('returns the default localization for that date', function() {
+              var result = instance.localize(date, { type: 'datetime', format: 'default' });
+              assert.equal(result, '5 feb 2014, 22.09');
+            });
+          });
+
+          describe('with type = "datetime" and format = "short"', function() {
+            it('returns the short datetime localization for that date', function() {
+              var result = instance.localize(date, { type: 'datetime', format: 'short' });
+              assert.equal(result, '2014-02-05 22.09');
+            });
+          });
+
+          describe('with type = "datetime" and format = "long"', function() {
+            it('returns the long datetime localization for that date', function() {
+              var result = instance.localize(date, { type: 'datetime', format: 'long' });
+              assert.equal(result, 'woensdag 5 februari 2014, 22.09.04');
+            });
+          });
+
+          describe('with type = "time" and format = "default"', function() {
+            it('returns the default time localization for that date', function() {
+              var result = instance.localize(date, { type: 'time', format: 'default' });
+              assert.equal(result, '22.09');
+            });
+          });
+
+          describe('with type = "time" and format = "short"', function() {
+            it('returns the short time localization for that date', function() {
+              var result = instance.localize(date, { type: 'time', format: 'short' });
+              assert.equal(result, '22.09');
+            });
+          });
+
+          describe('with type = "time" and format = "long"', function() {
+            it('returns the long time localization for that date', function() {
+              var result = instance.localize(date, { type: 'time', format: 'long' });
+              assert.equal(result, '22.09.04');
+            });
+          });
+
+          describe('with type = "date" and format = "default"', function() {
+            it('returns the default date localization for that date', function() {
+              var result = instance.localize(date, { type: 'date', format: 'default' });
+              assert.equal(result, '5 feb 2014');
+            });
+          });
+
+          describe('with type = "date" and format = "short"', function() {
+            it('returns the short date localization for that date', function() {
+              var result = instance.localize(date, { type: 'date', format: 'short' });
+              assert.equal(result, '2014-02-05');
+            });
+          });
+
+          describe('with type = "date" and format = "long"', function() {
+            it('returns the long date localization for that date', function() {
+              var result = instance.localize(date, { type: 'date', format: 'long' });
+              assert.equal(result, 'woensdag 5 februari 2014');
             });
           });
 
