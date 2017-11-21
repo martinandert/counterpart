@@ -11,7 +11,7 @@ module.exports = {
     formats: {
       date: {
         'default':  '%d.%m.%Y',
-        long:       'A%, %d.%m.%Y',
+        long:       '%A, %d.%m.%Y',
         short:      '%d.%m.%Y'
       },
 
@@ -23,7 +23,7 @@ module.exports = {
 
       datetime: {
         'default':  '%d.%m.%Y, %H:%M',
-        long:       'A%, %d.%m.%Y, %H:%M:%S',
+        long:       '%A, %d.%m.%Y, %H:%M:%S',
         short:      '%d.%m.%Y %H:%M'
       }
     }
