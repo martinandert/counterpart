@@ -220,8 +220,8 @@ Counterpart.prototype.translate = function(key, options) {
   }
 
   if (entry === null && fallbackLocales.length > 0 && fallbackLocales.indexOf(locale) === -1) {
-    for (var ix in fallbackLocales) {
-      var fallbackLocale = fallbackLocales[ix];
+    for (var i = 0, ii = fallbackLocales.length; i < ii; i++) {
+      var fallbackLocale = fallbackLocales[i];
       var fallbackKeys = this._normalizeKeys(fallbackLocale, scope, key, separator);
       entry = getEntry(this._registry.translations, fallbackKeys);
 
