@@ -46,6 +46,8 @@ function getEntry(translations, keys) {
 }
 
 function Counterpart() {
+  events.EventEmitter.apply(this);
+
   this._registry = {
     locale: 'en',
     interpolate: true,
@@ -64,7 +66,8 @@ function Counterpart() {
   this.setMaxListeners(0);
 }
 
-extend(Counterpart.prototype, events.EventEmitter.prototype);
+Counterpart.prototype = events.EventEmitter.prototype;
+Counterpart.prototype.constructor = events.EventEmitter;
 
 Counterpart.prototype.getLocale = function() {
   return this._registry.locale;
